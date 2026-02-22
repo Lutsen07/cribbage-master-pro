@@ -601,9 +601,6 @@
                     <button class="btn btn-secondary" onclick="randomHand()">
                         🎲 Random Hand
                     </button>
-                    <button class="btn btn-secondary" onclick="clearHand()">
-                        🗑️ Clear
-                    </button>
                 </div>
 
                 <!-- Quick Example Hands -->
@@ -649,14 +646,18 @@
                 
                 <!-- Crib Ownership Toggle -->
                 <div class="crib-toggle" style="text-align: center; margin-bottom: 30px;">
-                    <label style="color: gold; font-size: 1.2em; margin-right: 20px;">
-                        <input type="radio" name="cribOwner" value="yours" checked onchange="updateCribOwner()"> 
-                        🏠 Your Crib
-                    </label>
-                    <label style="color: gold; font-size: 1.2em;">
-                        <input type="radio" name="cribOwner" value="opponent" onchange="updateCribOwner()"> 
-                        👤 Opponent's Crib
-                    </label>
+                    <div style="margin-bottom: 10px;">
+                        <label style="color: gold; font-size: 1.2em;">
+                            <input type="radio" name="cribOwner" value="yours" checked onchange="updateCribOwner()"> 
+                            🏠 Your Crib
+                        </label>
+                    </div>
+                    <div>
+                        <label style="color: gold; font-size: 1.2em;">
+                            <input type="radio" name="cribOwner" value="opponent" onchange="updateCribOwner()"> 
+                            👤 Opponent's Crib
+                        </label>
+                    </div>
                 </div>
                 
                 <!-- 6-Card Display -->
@@ -693,9 +694,6 @@
                     </button>
                     <button class="btn btn-secondary" onclick="randomSixCards()">
                         🎲 Random 6 Cards
-                    </button>
-                    <button class="btn btn-secondary" onclick="clearDiscardHand()">
-                        🗑️ Clear
                     </button>
                 </div>
                 

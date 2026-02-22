@@ -281,41 +281,7 @@
             font-size: 1.3em;
         }
         
-        /* Quick Hands */
-        .quick-hands {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-        
-        .quick-hand-btn {
-            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 15px;
-            padding: 20px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-        
-        .quick-hand-btn:hover {
-            background: linear-gradient(145deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
-            border-color: gold;
-            transform: translateY(-2px);
-        }
-        
-        .quick-hand-name {
-            font-weight: bold;
-            margin-bottom: 10px;
-            font-size: 1.2em;
-        }
-        
-        .quick-hand-cards {
-            font-size: 0.9em;
-            opacity: 0.8;
-        }
+        /* Quick hands section removed - now auto-detected! */
         
         /* Tutorial Styles */
         .tutorial-card {
@@ -601,26 +567,7 @@
                     </button>
                 </div>
 
-                <!-- Quick Example Hands -->
-                <h3 class="section-title">⚡ Try These Famous Hands</h3>
-                <div class="quick-hands">
-                    <div class="quick-hand-btn" onclick="loadHand('perfect29')">
-                        <div class="quick-hand-name">Perfect 29 🏆</div>
-                        <div class="quick-hand-cards">5♥ 5♠ 5♣ J♦ + 5♦</div>
-                    </div>
-                    <div class="quick-hand-btn" onclick="loadHand('double-run')">
-                        <div class="quick-hand-name">Double Run 🔄</div>
-                        <div class="quick-hand-cards">A♠ 2♥ 3♣ 3♦ + 4♠</div>
-                    </div>
-                    <div class="quick-hand-btn" onclick="loadHand('flush')">
-                        <div class="quick-hand-name">Royal Flush ♠️</div>
-                        <div class="quick-hand-cards">J♠ Q♠ K♠ A♠ + 10♠</div>
-                    </div>
-                    <div class="quick-hand-btn" onclick="loadHand('fifteens')">
-                        <div class="quick-hand-name">Fifteen City 🎯</div>
-                        <div class="quick-hand-cards">5♥ 5♠ 10♣ 10♦ + J♠</div>
-                    </div>
-                </div>
+                <!-- Famous hands now auto-detected and titled! -->
             </div>
 
             <!-- Score Display -->
@@ -1240,13 +1187,118 @@
             displayScore(result);
         }
 
+        // Detect famous cribbage hands
+        function detectFamousHand(handCards, starterCard, totalScore) {
+            const allCards = [...handCards, starterCard];
+            const ranks = allCards.map(card => card.rank);
+            const suits = allCards.map(card => card.suit);
+            
+            // Perfect 29 - Three 5s + Jack + 5 starter, Jack same suit as starter
+            if (totalScore === 29) {
+                const fives = ranks.filter(rank => rank === '5').length;
+                const jacks = ranks.filter(rank => rank === 'J').length;
+                if (fives === 4 && jacks === 1) {
+                    return "🏆 PERFECT 29! 🏆";
+                }
+            }
+            
+            // Royal Flush - 10, J, Q, K, A all same suit
+            const suitCounts = {};
+            suits.forEach(suit => {
+                suitCounts[suit] = (suitCounts[suit] || 0) + 1;
+            });
+            const hasFlush = Object.values(suitCounts).some(count => count === 5);
+            
+            if (hasFlush && totalScore >= 12) {
+                const royalRanks = ['10', 'J', 'Q', 'K', 'A'];
+                const hasAllRoyal = royalRanks.every(rank => ranks.includes(rank));
+                if (hasAllRoyal) {
+                    return "♠️ ROYAL FLUSH ♠️";
+                }
+            }
+            
+            // Four of a Kind
+            const rankCounts = {};
+            ranks.forEach(rank => {
+                rankCounts[rank] = (rankCounts[rank] || 0) + 1;
+            });
+            const maxRankCount = Math.max(...Object.values(rankCounts));
+            
+            if (maxRankCount === 4) {
+                return "🎯 FOUR OF A KIND! 🎯";
+            }
+            
+            // Double Pair Royal (two pairs)
+            const pairCount = Object.values(rankCounts).filter(count => count === 2).length;
+            if (pairCount === 2 && totalScore >= 8) {
+                return "👥 DOUBLE PAIR ROYAL 👥";
+            }
+            
+            // Check for runs with pairs (double runs, triple runs)
+            const uniqueRanks = Object.keys(rankCounts);
+            const rankValues = uniqueRanks.map(rank => {
+                if (rank === 'A') return 1;
+                if (rank === 'J') return 11;
+                if (rank === 'Q') return 12;  
+                if (rank === 'K') return 13;
+                return parseInt(rank);
+            }).sort((a, b) => a - b);
+            
+            // Check for consecutive ranks (runs)
+            let isRun = true;
+            for (let i = 1; i < rankValues.length; i++) {
+                if (rankValues[i] !== rankValues[i-1] + 1) {
+                    isRun = false;
+                    break;
+                }
+            }
+            
+            if (isRun && rankValues.length >= 3) {
+                const hasTriple = Object.values(rankCounts).some(count => count === 3);
+                const hasPair = Object.values(rankCounts).some(count => count === 2);
+                
+                if (hasTriple && totalScore >= 15) {
+                    return "🔄 TRIPLE RUN 🔄";
+                } else if (hasPair && totalScore >= 8) {
+                    return "🔄 DOUBLE RUN 🔄";
+                }
+            }
+            
+            // Fifteen City (multiple fifteens) - detect by high scores with no other patterns
+            if (totalScore >= 8 && maxRankCount <= 2 && !hasFlush) {
+                // High score without major patterns suggests lots of fifteens
+                return "🎯 FIFTEEN CITY 🎯";
+            }
+            
+            // High scoring hands
+            if (totalScore >= 24) {
+                return "🌟 AMAZING HAND! 🌟";
+            } else if (totalScore >= 20) {
+                return "🎉 EXCELLENT HAND! 🎉";
+            } else if (totalScore >= 16) {
+                return "👏 GREAT HAND! 👏";
+            }
+            
+            return null; // No famous hand detected
+        }
+        
         // Display detailed score breakdown with consistent table design
         function displayScore(result) {
             const scoreDisplay = document.getElementById('scoreDisplay');
             const totalScore = document.getElementById('totalScore');
             const breakdown = document.getElementById('scoreBreakdown');
             
-            totalScore.textContent = `${result.totalScore} Points`;
+            // Detect famous hands
+            const handCards = currentHand.map(card => new CribbageCard(card.rank, card.suit));
+            const starterCard = new CribbageCard(starter.rank, starter.suit);
+            const famousHand = detectFamousHand(handCards, starterCard, result.totalScore);
+            
+            // Display score with famous hand title if detected
+            const scoreText = famousHand 
+                ? `${famousHand}\n${result.totalScore} Points`
+                : `${result.totalScore} Points`;
+            
+            totalScore.innerHTML = scoreText.replace('\n', '<br>');
             totalScore.classList.add('score-pop');
             setTimeout(() => totalScore.classList.remove('score-pop'), 500);
             
@@ -1388,49 +1440,7 @@
             scoreDisplay.style.display = 'block';
         }
 
-        // Load predefined hands
-        function loadHand(handType) {
-            switch(handType) {
-                case 'perfect29':
-                    currentHand = [
-                        { rank: '5', suit: 'H' },
-                        { rank: '5', suit: 'S' },
-                        { rank: '5', suit: 'C' },
-                        { rank: 'J', suit: 'D' }
-                    ];
-                    starter = { rank: '5', suit: 'D' };
-                    break;
-                case 'double-run':
-                    currentHand = [
-                        { rank: 'A', suit: 'S' },
-                        { rank: '2', suit: 'H' },
-                        { rank: '3', suit: 'C' },
-                        { rank: '3', suit: 'D' }
-                    ];
-                    starter = { rank: '4', suit: 'S' };
-                    break;
-                case 'flush':
-                    currentHand = [
-                        { rank: 'J', suit: 'S' },
-                        { rank: 'Q', suit: 'S' },
-                        { rank: 'K', suit: 'S' },
-                        { rank: 'A', suit: 'S' }
-                    ];
-                    starter = { rank: '10', suit: 'S' };
-                    break;
-                case 'fifteens':
-                    currentHand = [
-                        { rank: '5', suit: 'H' },
-                        { rank: '5', suit: 'S' },
-                        { rank: '10', suit: 'C' },
-                        { rank: '10', suit: 'D' }
-                    ];
-                    starter = { rank: 'J', suit: 'S' };
-                    break;
-            }
-            updateDisplay();
-            setTimeout(() => calculateScore(), 100); // Small delay to ensure display updates first
-        }
+        // Famous hands now auto-detected - no manual loading needed!
 
         // Generate random hand (no duplicates)
         function randomHand() {

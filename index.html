@@ -599,9 +599,6 @@
 
                 <!-- Controls -->
                 <div class="controls">
-                    <button class="btn btn-primary" onclick="calculateScore()">
-                        🎯 Calculate Score
-                    </button>
                     <button class="btn btn-secondary" onclick="randomHand()">
                         🎲 Random Hand
                     </button>
@@ -693,9 +690,6 @@
                 </div>
                 
                 <div class="controls">
-                    <button class="btn btn-primary" onclick="analyzeDiscards()">
-                        🧠 Analyze All 15 Options
-                    </button>
                     <button class="btn btn-secondary" onclick="randomSixCards()">
                         🎲 Random 6 Cards
                     </button>
@@ -1020,6 +1014,11 @@
             ensureNoDuplicates();
             updateDisplay();
             updateStats();
+            // Auto-calculate initial hands
+            calculateScore();
+            if (discardHand && discardHand.length === 6) {
+                analyzeDiscards();
+            }
         });
         
         // Ensure no duplicate cards in initial setup
@@ -1107,6 +1106,7 @@
                         currentHand[index] = nextCard;
                     }
                     updateDisplay();
+                    calculateScore();
                     return;
                 }
             }
@@ -1135,6 +1135,7 @@
                         currentHand[index] = nextCard;
                     }
                     updateDisplay();
+                    calculateScore();
                     return;
                 }
             }
@@ -1488,6 +1489,7 @@
             starter = newCards[4];
             
             updateDisplay();
+            calculateScore();
         }
 
         // Clear hand
@@ -1588,6 +1590,7 @@
                 if (!isDiscardCardDuplicate(nextCard, index)) {
                     discardHand[index] = nextCard;
                     updateDiscardDisplay();
+                    analyzeDiscards();
                     return;
                 }
             }
@@ -1612,6 +1615,7 @@
                 if (!isDiscardCardDuplicate(nextCard, index)) {
                     discardHand[index] = nextCard;
                     updateDiscardDisplay();
+                    analyzeDiscards();
                     return;
                 }
             }
@@ -1637,6 +1641,11 @@
         function updateCribOwner() {
             const radios = document.getElementsByName('cribOwner');
             isOwnCrib = radios[0].checked; // First radio is "yours"
+            
+            // Auto-analyze if cards are already set
+            if (discardHand && discardHand.length === 6) {
+                analyzeDiscards();
+            }
         }
         
         // Generate all 15 keep/discard combinations
@@ -1929,6 +1938,7 @@
             
             discardHand = newCards;
             updateDiscardDisplay();
+            analyzeDiscards();
         }
         
         // Clear discard hand

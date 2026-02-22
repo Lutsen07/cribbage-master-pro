@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🃏 Cribbage Master Pro - Complete App</title>
+    <title>🃏 Cribbage Pro</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -60,18 +60,18 @@
         }
         
         .nav-tab {
-            padding: 15px 25px;
+            padding: 12px 20px;
             background: linear-gradient(145deg, #444, #222);
             color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 1.1em;
+            border-radius: 10px;
+            font-size: 1em;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            letter-spacing: 0.5px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
         }
         
         .nav-tab:hover {
@@ -198,22 +198,22 @@
         .controls {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 10px;
             justify-content: center;
-            margin: 30px 0;
+            margin: 20px 0;
         }
         
         .btn {
-            padding: 15px 30px;
-            font-size: 1.1em;
+            padding: 10px 20px;
+            font-size: 1em;
             border: none;
-            border-radius: 12px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
             font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            letter-spacing: 0.5px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
         }
         
         .btn-primary {
@@ -497,7 +497,7 @@
             .card { width: 75px; height: 105px; font-size: 1.3em; }
             .card-table { padding: 15px; margin-bottom: 15px; }
             .nav-tabs { gap: 5px; margin-bottom: 15px; }
-            .nav-tab { padding: 12px 18px; font-size: 1em; }
+            .nav-tab { padding: 10px 16px; font-size: 0.9em; }
             .controls { gap: 8px; }
             .app-header { padding: 10px; margin-bottom: 15px; }
         }
@@ -541,23 +541,20 @@
     <div class="app-container">
         <!-- Header -->
         <header class="app-header">
-            <h1 class="app-title">🃏 Cribbage Master Pro</h1>
-            <p class="app-subtitle">The Ultimate Cribbage Scoring & Strategy App</p>
+            <h1 class="app-title">🃏 Cribbage Pro</h1>
+            <p class="app-subtitle">Scoring & Strategy</p>
         </header>
 
         <!-- Navigation -->
         <nav class="nav-tabs">
             <button class="nav-tab active" onclick="showTab('scorer')">
-                🎯 Hand Scorer
+                🎯 Scorer
             </button>
             <button class="nav-tab" onclick="showTab('discard')">
-                🧠 Discard Assistant
+                🧠 Discard
             </button>
             <button class="nav-tab" onclick="showTab('tutorial')">
-                📚 Learn Cribbage
-            </button>
-            <button class="nav-tab" onclick="showTab('stats')">
-                📊 Statistics
+                📚 Learn
             </button>
         </nav>
 
@@ -756,38 +753,7 @@
             </div>
         </div>
 
-        <!-- Statistics Tab -->
-        <div id="stats" class="tab-content">
-            <div class="card-table">
-                <h2 class="section-title">📊 Your Cribbage Statistics</h2>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="handsScored">0</div>
-                        <div class="stat-label">Hands Scored</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="avgScore">0</div>
-                        <div class="stat-label">Average Score</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="bestHand">0</div>
-                        <div class="stat-label">Best Hand</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="perfectHands">0</div>
-                        <div class="stat-label">Perfect 29s</div>
-                    </div>
-                </div>
-                
-                <div class="tutorial-card">
-                    <h3 class="tutorial-title">🎯 Score Distribution</h3>
-                    <div id="scoreDistribution">
-                        <!-- Will be populated by JS -->
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- Statistics section removed for space saving -->
     </div>
 
     <script>
@@ -1013,7 +979,6 @@
             // Ensure starting hands have no duplicates
             ensureNoDuplicates();
             updateDisplay();
-            updateStats();
             // Auto-calculate initial hands
             calculateScore();
             if (discardHand && discardHand.length === 6) {
@@ -1273,7 +1238,6 @@
             
             // Display results
             displayScore(result);
-            updateStats();
         }
 
         // Display detailed score breakdown with consistent table design
@@ -1950,15 +1914,7 @@
             selectedDiscardIndex = -1;
         }
 
-        // Update statistics display
-        function updateStats() {
-            document.getElementById('handsScored').textContent = gameStats.handsScored;
-            document.getElementById('avgScore').textContent = gameStats.handsScored > 0 
-                ? Math.round((gameStats.totalScore / gameStats.handsScored) * 10) / 10 
-                : 0;
-            document.getElementById('bestHand').textContent = gameStats.bestHand;
-            document.getElementById('perfectHands').textContent = gameStats.perfectHands;
-        }
+        // Statistics functionality removed for streamlined interface
     </script>
 </body>
 </html>

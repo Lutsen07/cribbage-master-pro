@@ -549,7 +549,7 @@
             margin-bottom: 20px;
         }
         
-        /* Vertical Cribbage Board Layout */
+        /* Vertical Serpentine Cribbage Board Layout */
         .traditional-board {
             background: linear-gradient(145deg, #8b4513, #a0522d);
             border-radius: 20px;
@@ -557,42 +557,41 @@
             margin: 20px auto;
             border: 4px solid #654321;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.3), 0 10px 30px rgba(0,0,0,0.5);
-            max-width: 280px;
-            max-height: 80vh;
+            max-width: 320px;
+            max-height: 85vh;
             overflow-y: auto;
         }
         
         .board-container-vertical {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             gap: 8px;
-            align-items: center;
+            justify-content: center;
+            align-items: stretch;
         }
         
-        .board-track {
+        .board-column {
             display: flex;
             flex-direction: column;
-            gap: 3px;
-            width: 100%;
-        }
-        
-        .board-row {
-            display: flex;
-            justify-content: space-between;
+            gap: 4px;
             align-items: center;
-            background: rgba(139, 69, 19, 0.6);
-            border-radius: 8px;
-            padding: 8px;
+            background: rgba(139, 69, 19, 0.4);
+            border-radius: 10px;
+            padding: 8px 4px;
             border: 1px solid rgba(255,255,255,0.1);
         }
         
-        .row-section {
-            display: flex;
-            gap: 3px;
+        .board-column.reverse {
+            flex-direction: column-reverse;
         }
         
-        .row-section.reverse {
-            flex-direction: row-reverse;
+        .finish-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+            padding: 10px;
+            width: 100%;
         }
         
         .scoreboard-hole {
@@ -841,11 +840,11 @@
         @media (max-width: 768px) {
             .traditional-board { 
                 padding: 10px; 
-                max-width: 260px;
+                max-width: 300px;
                 margin: 10px auto;
             }
-            .board-row { padding: 6px; gap: 10px; }
-            .row-section { gap: 2px; }
+            .board-container-vertical { gap: 6px; }
+            .board-column { padding: 6px 3px; gap: 3px; }
             .scoreboard-hole { 
                 width: 20px; 
                 height: 20px; 
@@ -866,11 +865,11 @@
         @media (max-width: 480px) {
             .traditional-board { 
                 padding: 8px; 
-                max-width: 240px;
-                max-height: 75vh;
+                max-width: 280px;
+                max-height: 80vh;
             }
-            .board-row { padding: 4px; }
-            .row-section { gap: 1px; }
+            .board-container-vertical { gap: 4px; }
+            .board-column { padding: 4px 2px; gap: 2px; }
             .scoreboard-hole { 
                 width: 18px; 
                 height: 18px; 
@@ -2458,7 +2457,7 @@
             }
         };
 
-        // Create vertical traditional cribbage board layout
+        // Create vertical serpentine traditional cribbage board layout
         function createScoreboardBoard() {
             const board = document.getElementById('scoreboardCribbageBoard');
             if (!board) return;
@@ -2468,76 +2467,49 @@
             const container = document.createElement('div');
             container.className = 'board-container-vertical';
             
-            const track = document.createElement('div');
-            track.className = 'board-track';
+            // Create 10 columns of 12 holes each (serpentine pattern)
+            // Column 1: 1-12 (top to bottom)
+            // Column 2: 13-24 (bottom to top)  
+            // Column 3: 25-36 (top to bottom) - includes corner at 30
+            // Column 4: 37-48 (bottom to top)
+            // Column 5: 49-60 (top to bottom) - includes corner at 60
+            // Column 6: 61-72 (bottom to top)
+            // Column 7: 73-84 (top to bottom)
+            // Column 8: 85-96 (bottom to top) - includes corner at 90
+            // Column 9: 97-108 (top to bottom)
+            // Column 10: 109-120 (bottom to top) - includes corner at 120
             
-            // Create rows of 10 holes each (serpentine pattern)
-            // Row 1: 1-10 (left to right)
-            // Row 2: 11-20 (right to left)
-            // Row 3: 21-30 (left to right) - CORNER
-            // Row 4: 31-40 (right to left)
-            // Row 5: 41-50 (left to right)
-            // Row 6: 51-60 (right to left) - CORNER
-            // Row 7: 61-70 (left to right)
-            // Row 8: 71-80 (right to left)
-            // Row 9: 81-90 (left to right) - CORNER
-            // Row 10: 91-100 (right to left)
-            // Row 11: 101-110 (left to right)
-            // Row 12: 111-120 (right to left) - CORNER
-            // Row 13: 121 (center finish)
-            
-            for (let row = 0; row < 12; row++) {
-                const startHole = row * 10 + 1;
-                const endHole = (row + 1) * 10;
-                const isReverse = row % 2 === 1; // Every other row is reversed
+            for (let col = 0; col < 10; col++) {
+                const startHole = col * 12 + 1;
+                const endHole = (col + 1) * 12;
+                const isReverse = col % 2 === 1; // Every other column is reversed (bottom to top)
                 
-                createVerticalBoardRow(track, startHole, endHole, isReverse);
+                createVerticalColumn(container, startHole, endHole, isReverse);
             }
             
-            // Create finish row for hole 121
-            createFinishRow(track);
-            
-            container.appendChild(track);
             board.appendChild(container);
+            
+            // Create finish section for hole 121
+            const finishSection = createFinishSection();
+            board.appendChild(finishSection);
         }
         
-        function createVerticalBoardRow(parent, start, end, reverse) {
-            const row = document.createElement('div');
-            row.className = 'board-row';
+        function createVerticalColumn(parent, start, end, reverse) {
+            const column = document.createElement('div');
+            column.className = reverse ? 'board-column reverse' : 'board-column';
             
             const holes = [];
             for (let i = start; i <= end; i++) {
                 holes.push(i);
             }
             
-            if (reverse) holes.reverse();
-            
-            // Create two sections of 5 holes each
-            const section1 = document.createElement('div');
-            section1.className = reverse ? 'row-section reverse' : 'row-section';
-            
-            const section2 = document.createElement('div');
-            section2.className = reverse ? 'row-section reverse' : 'row-section';
-            
-            holes.slice(0, 5).forEach((holeNum, index) => {
+            // Don't reverse the array - let CSS handle the visual reversal
+            holes.forEach(holeNum => {
                 const hole = createHole(holeNum);
-                section1.appendChild(hole);
+                column.appendChild(hole);
             });
             
-            holes.slice(5, 10).forEach((holeNum, index) => {
-                const hole = createHole(holeNum);
-                section2.appendChild(hole);
-            });
-            
-            if (reverse) {
-                row.appendChild(section2);
-                row.appendChild(section1);
-            } else {
-                row.appendChild(section1);
-                row.appendChild(section2);
-            }
-            
-            parent.appendChild(row);
+            parent.appendChild(column);
         }
         
         function createHole(holeNum) {
@@ -2555,13 +2527,9 @@
             return hole;
         }
         
-        function createFinishRow(parent) {
-            const row = document.createElement('div');
-            row.className = 'board-row';
-            row.style.justifyContent = 'center';
-            
-            const section = document.createElement('div');
-            section.className = 'row-section';
+        function createFinishSection() {
+            const finishSection = document.createElement('div');
+            finishSection.className = 'finish-section';
             
             const hole = document.createElement('div');
             hole.className = 'scoreboard-hole';
@@ -2572,11 +2540,12 @@
             hole.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.8)';
             hole.style.fontSize = '0.8em';
             hole.style.fontWeight = 'bold';
+            hole.style.width = '28px';
+            hole.style.height = '28px';
             
             hole.addEventListener('click', () => handleHoleClick(121));
-            section.appendChild(hole);
-            row.appendChild(section);
-            parent.appendChild(row);
+            finishSection.appendChild(hole);
+            return finishSection;
         }
 
         // Handle hole click - traditional two-peg system

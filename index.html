@@ -549,40 +549,55 @@
             margin-bottom: 20px;
         }
         
-        /* Traditional Cribbage Board Layout */
+        /* Vertical Cribbage Board Layout */
         .traditional-board {
             background: linear-gradient(145deg, #8b4513, #a0522d);
             border-radius: 20px;
-            padding: 30px;
-            margin: 20px 0;
+            padding: 15px;
+            margin: 20px auto;
             border: 4px solid #654321;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.3), 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 280px;
+            max-height: 80vh;
+            overflow-y: auto;
         }
         
-        .board-lanes {
+        .board-container-vertical {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 8px;
+            align-items: center;
         }
         
-        .board-lane {
+        .board-track {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            width: 100%;
+        }
+        
+        .board-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(139, 69, 19, 0.8);
-            border-radius: 10px;
-            padding: 15px;
-            border: 2px solid rgba(255,255,255,0.1);
+            background: rgba(139, 69, 19, 0.6);
+            border-radius: 8px;
+            padding: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
         
-        .lane-section {
+        .row-section {
             display: flex;
-            gap: 4px;
+            gap: 3px;
+        }
+        
+        .row-section.reverse {
+            flex-direction: row-reverse;
         }
         
         .scoreboard-hole {
-            width: 18px;
-            height: 18px;
+            width: 24px;
+            height: 24px;
             background: #654321;
             border-radius: 50%;
             border: 2px solid #8b4513;
@@ -590,6 +605,12 @@
             cursor: pointer;
             transition: all 0.3s;
             box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7em;
+            color: #fff;
+            font-weight: bold;
         }
         
         .scoreboard-hole:hover {
@@ -618,8 +639,8 @@
         }
         
         .scoreboard-peg {
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             position: absolute;
             top: 50%;
@@ -818,15 +839,47 @@
         }
         
         @media (max-width: 768px) {
-            .traditional-board { padding: 20px; }
-            .board-lane { padding: 10px; gap: 15px; }
-            .lane-section { gap: 3px; }
-            .scoreboard-hole { width: 16px; height: 16px; font-size: 0.6em; }
-            .scoreboard-peg { width: 12px; height: 12px; }
+            .traditional-board { 
+                padding: 10px; 
+                max-width: 260px;
+                margin: 10px auto;
+            }
+            .board-row { padding: 6px; gap: 10px; }
+            .row-section { gap: 2px; }
+            .scoreboard-hole { 
+                width: 20px; 
+                height: 20px; 
+                font-size: 0.6em;
+                border-width: 1px;
+            }
+            .scoreboard-peg { 
+                width: 14px; 
+                height: 14px;
+                border-width: 1px;
+            }
             .current-score { font-size: 2.5em; }
             .score-confirmation { padding: 15px; margin: 15px 0; }
             .confirmation-buttons { flex-direction: column; gap: 10px; }
             .confirm-btn { padding: 10px 20px; }
+        }
+        
+        @media (max-width: 480px) {
+            .traditional-board { 
+                padding: 8px; 
+                max-width: 240px;
+                max-height: 75vh;
+            }
+            .board-row { padding: 4px; }
+            .row-section { gap: 1px; }
+            .scoreboard-hole { 
+                width: 18px; 
+                height: 18px; 
+                font-size: 0.55em;
+            }
+            .scoreboard-peg { 
+                width: 12px; 
+                height: 12px;
+            }
         }
     </style>
 </head>
@@ -2405,35 +2458,52 @@
             }
         };
 
-        // Create traditional cribbage board layout
+        // Create vertical traditional cribbage board layout
         function createScoreboardBoard() {
             const board = document.getElementById('scoreboardCribbageBoard');
             if (!board) return;
             
             board.innerHTML = '';
             
-            // Create 4 lanes of 30 holes each, plus 1 finish hole
-            // Layout: 0-30, 31-60, 61-90, 91-120, 121
+            const container = document.createElement('div');
+            container.className = 'board-container-vertical';
             
-            // Lane 1: 1-30 (left to right)
-            createBoardLane(board, 1, 30, false);
+            const track = document.createElement('div');
+            track.className = 'board-track';
             
-            // Lane 2: 31-60 (right to left)
-            createBoardLane(board, 31, 60, true);
+            // Create rows of 10 holes each (serpentine pattern)
+            // Row 1: 1-10 (left to right)
+            // Row 2: 11-20 (right to left)
+            // Row 3: 21-30 (left to right) - CORNER
+            // Row 4: 31-40 (right to left)
+            // Row 5: 41-50 (left to right)
+            // Row 6: 51-60 (right to left) - CORNER
+            // Row 7: 61-70 (left to right)
+            // Row 8: 71-80 (right to left)
+            // Row 9: 81-90 (left to right) - CORNER
+            // Row 10: 91-100 (right to left)
+            // Row 11: 101-110 (left to right)
+            // Row 12: 111-120 (right to left) - CORNER
+            // Row 13: 121 (center finish)
             
-            // Lane 3: 61-90 (left to right)  
-            createBoardLane(board, 61, 90, false);
+            for (let row = 0; row < 12; row++) {
+                const startHole = row * 10 + 1;
+                const endHole = (row + 1) * 10;
+                const isReverse = row % 2 === 1; // Every other row is reversed
+                
+                createVerticalBoardRow(track, startHole, endHole, isReverse);
+            }
             
-            // Lane 4: 91-120 (right to left)
-            createBoardLane(board, 91, 120, true);
+            // Create finish row for hole 121
+            createFinishRow(track);
             
-            // Finish lane: 121 (center)
-            createFinishLane(board);
+            container.appendChild(track);
+            board.appendChild(container);
         }
         
-        function createBoardLane(parent, start, end, reverse) {
-            const lane = document.createElement('div');
-            lane.className = 'board-lane';
+        function createVerticalBoardRow(parent, start, end, reverse) {
+            const row = document.createElement('div');
+            row.className = 'board-row';
             
             const holes = [];
             for (let i = start; i <= end; i++) {
@@ -2442,67 +2512,71 @@
             
             if (reverse) holes.reverse();
             
-            // Create sections of 5 holes each
-            for (let i = 0; i < holes.length; i += 5) {
-                const section = document.createElement('div');
-                section.className = 'lane-section';
-                
-                const sectionHoles = holes.slice(i, i + 5);
-                if (reverse) sectionHoles.reverse();
-                
-                sectionHoles.forEach(holeNum => {
-                    const hole = document.createElement('div');
-                    hole.className = 'scoreboard-hole';
-                    hole.id = `scoreboard-hole-${holeNum}`;
-                    hole.textContent = holeNum;
-                    hole.style.fontSize = '0.7em';
-                    hole.style.color = '#fff';
-                    hole.style.fontWeight = 'bold';
-                    hole.style.display = 'flex';
-                    hole.style.alignItems = 'center';
-                    hole.style.justifyContent = 'center';
-                    
-                    // Mark corner positions
-                    if (holeNum === 30 || holeNum === 60 || holeNum === 90 || holeNum === 120) {
-                        hole.classList.add('corner');
-                    }
-                    
-                    hole.addEventListener('click', () => handleHoleClick(holeNum));
-                    section.appendChild(hole);
-                });
-                
-                lane.appendChild(section);
+            // Create two sections of 5 holes each
+            const section1 = document.createElement('div');
+            section1.className = reverse ? 'row-section reverse' : 'row-section';
+            
+            const section2 = document.createElement('div');
+            section2.className = reverse ? 'row-section reverse' : 'row-section';
+            
+            holes.slice(0, 5).forEach((holeNum, index) => {
+                const hole = createHole(holeNum);
+                section1.appendChild(hole);
+            });
+            
+            holes.slice(5, 10).forEach((holeNum, index) => {
+                const hole = createHole(holeNum);
+                section2.appendChild(hole);
+            });
+            
+            if (reverse) {
+                row.appendChild(section2);
+                row.appendChild(section1);
+            } else {
+                row.appendChild(section1);
+                row.appendChild(section2);
             }
             
-            parent.appendChild(lane);
+            parent.appendChild(row);
         }
         
-        function createFinishLane(parent) {
-            const lane = document.createElement('div');
-            lane.className = 'board-lane';
-            lane.style.justifyContent = 'center';
+        function createHole(holeNum) {
+            const hole = document.createElement('div');
+            hole.className = 'scoreboard-hole';
+            hole.id = `scoreboard-hole-${holeNum}`;
+            hole.textContent = holeNum;
+            
+            // Mark corner positions
+            if (holeNum === 30 || holeNum === 60 || holeNum === 90 || holeNum === 120) {
+                hole.classList.add('corner');
+            }
+            
+            hole.addEventListener('click', () => handleHoleClick(holeNum));
+            return hole;
+        }
+        
+        function createFinishRow(parent) {
+            const row = document.createElement('div');
+            row.className = 'board-row';
+            row.style.justifyContent = 'center';
             
             const section = document.createElement('div');
-            section.className = 'lane-section';
+            section.className = 'row-section';
             
             const hole = document.createElement('div');
             hole.className = 'scoreboard-hole';
             hole.id = 'scoreboard-hole-121';
             hole.textContent = '121';
-            hole.style.fontSize = '0.8em';
-            hole.style.color = '#fff';
-            hole.style.fontWeight = 'bold';
-            hole.style.display = 'flex';
-            hole.style.alignItems = 'center';
-            hole.style.justifyContent = 'center';
             hole.style.background = '#ffd700';
-            hole.style.border = '3px solid #ffed4e';
+            hole.style.borderColor = '#ffed4e';
             hole.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.8)';
+            hole.style.fontSize = '0.8em';
+            hole.style.fontWeight = 'bold';
             
             hole.addEventListener('click', () => handleHoleClick(121));
             section.appendChild(hole);
-            lane.appendChild(section);
-            parent.appendChild(lane);
+            row.appendChild(section);
+            parent.appendChild(row);
         }
 
         // Handle hole click - traditional two-peg system

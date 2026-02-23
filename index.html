@@ -549,59 +549,174 @@
             margin-bottom: 20px;
         }
         
-        .scoreboard-board {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(15px, 1fr));
-            gap: 3px;
-            max-width: 100%;
+        /* Traditional Cribbage Board Layout */
+        .traditional-board {
+            background: linear-gradient(145deg, #8b4513, #a0522d);
+            border-radius: 20px;
+            padding: 30px;
             margin: 20px 0;
-            padding: 20px;
-            background: rgba(139, 69, 19, 0.3);
+            border: 4px solid #654321;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.3), 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        .board-lanes {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .board-lane {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(139, 69, 19, 0.8);
             border-radius: 10px;
+            padding: 15px;
             border: 2px solid rgba(255,255,255,0.1);
         }
         
+        .lane-section {
+            display: flex;
+            gap: 4px;
+        }
+        
         .scoreboard-hole {
-            width: 15px;
-            height: 15px;
-            background: #8b4513;
+            width: 18px;
+            height: 18px;
+            background: #654321;
             border-radius: 50%;
-            border: 1px solid #654321;
+            border: 2px solid #8b4513;
             position: relative;
             cursor: pointer;
             transition: all 0.3s;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
         }
         
         .scoreboard-hole:hover {
             background: #daa520;
-            transform: scale(1.2);
+            border-color: #ffd700;
+            transform: scale(1.15);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
         }
         
         .scoreboard-hole.corner {
-            background: #ffd700;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            background: #b8860b;
+            border-color: #ffd700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+        }
+        
+        .scoreboard-hole.preview {
+            background: #90ee90;
+            border-color: #32cd32;
+            box-shadow: 0 0 15px rgba(50, 205, 50, 0.6);
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
         
         .scoreboard-peg {
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             border: 2px solid white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            animation: pegDrop 0.5s ease-out;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            z-index: 10;
         }
         
-        @keyframes pegDrop {
-            0% { transform: translate(-50%, -150%); opacity: 0; }
-            100% { transform: translate(-50%, -50%); opacity: 1; }
+        .scoreboard-peg.current {
+            animation: pegPlace 0.6s ease-out;
+            border-width: 3px;
         }
         
-        .scoreboard-peg.player1 { background: #e74c3c; }
-        .scoreboard-peg.player2 { background: #3498db; }
+        .scoreboard-peg.previous {
+            opacity: 0.7;
+            border-width: 2px;
+            z-index: 5;
+        }
+        
+        @keyframes pegPlace {
+            0% { transform: translate(-50%, -200%) scale(0.5); opacity: 0; }
+            50% { transform: translate(-50%, -60%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
+        .scoreboard-peg.player1 { background: #dc2626; }
+        .scoreboard-peg.player2 { background: #2563eb; }
+        
+        /* Score Confirmation */
+        .score-confirmation {
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+            border: 2px solid #ffd700;
+        }
+        
+        .score-confirmation.hidden {
+            display: none;
+        }
+        
+        .points-scored {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #ffd700;
+            margin: 10px 0;
+        }
+        
+        .confirmation-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        .confirm-btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            border: none;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .confirm-btn.accept {
+            background: linear-gradient(145deg, #16a34a, #22c55e);
+            color: white;
+        }
+        
+        .confirm-btn.cancel {
+            background: linear-gradient(145deg, #dc2626, #ef4444);
+            color: white;
+        }
+        
+        .confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        /* Instructions */
+        .board-instructions {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: white;
+        }
+        
+        .board-instructions strong {
+            color: #ffd700;
+        }
         
         .score-display {
             display: grid;
@@ -649,35 +764,7 @@
             margin-top: 10px;
         }
         
-        .scoring-buttons {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .score-btn {
-            padding: 20px 10px;
-            font-size: 1.5em;
-            font-weight: bold;
-            border-radius: 12px;
-            background: linear-gradient(145deg, #2c3e50, #34495e);
-            color: white;
-            border: 2px solid rgba(255,255,255,0.2);
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-        
-        .score-btn:hover {
-            background: linear-gradient(145deg, #3498db, #5dade2);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        }
-        
-        .score-btn:active {
-            transform: translateY(1px);
-        }
+        /* Old scoring buttons removed - using traditional click-to-score */
         
         .stats-grid {
             display: grid;
@@ -731,12 +818,15 @@
         }
         
         @media (max-width: 768px) {
-            .scoreboard-board { gap: 2px; padding: 15px; }
-            .scoreboard-hole { width: 12px; height: 12px; }
-            .scoreboard-peg { width: 10px; height: 10px; }
-            .scoring-buttons { grid-template-columns: repeat(4, 1fr); }
-            .score-btn { padding: 15px 8px; font-size: 1.3em; }
+            .traditional-board { padding: 20px; }
+            .board-lane { padding: 10px; gap: 15px; }
+            .lane-section { gap: 3px; }
+            .scoreboard-hole { width: 16px; height: 16px; font-size: 0.6em; }
+            .scoreboard-peg { width: 12px; height: 12px; }
             .current-score { font-size: 2.5em; }
+            .score-confirmation { padding: 15px; margin: 15px 0; }
+            .confirmation-buttons { flex-direction: column; gap: 10px; }
+            .confirm-btn { padding: 10px 20px; }
         }
     </style>
 </head>
@@ -952,28 +1042,33 @@
                     </div>
                 </div>
 
-                <!-- Cribbage Board -->
-                <div class="scoreboard-section">
-                    <h3 class="section-title">🎲 Cribbage Board (121 Points)</h3>
-                    <div class="scoreboard-board" id="scoreboardCribbageBoard"></div>
+                <!-- Instructions -->
+                <div class="board-instructions">
+                    <strong>How to Score:</strong> Select a player above, then click any hole on the board to place their new peg. 
+                    The system shows points scored and prevents moves over 29 points per turn. Confirm or cancel each move.
                 </div>
 
-                <!-- Scoring Buttons -->
+                <!-- Traditional Cribbage Board -->
                 <div class="scoreboard-section">
-                    <h3 class="section-title">⚡ Quick Scoring - Click Player First</h3>
-                    <div class="scoring-buttons">
-                        <button class="score-btn" onclick="addScoreboardScore(1)">+1</button>
-                        <button class="score-btn" onclick="addScoreboardScore(2)">+2</button>
-                        <button class="score-btn" onclick="addScoreboardScore(3)">+3</button>
-                        <button class="score-btn" onclick="addScoreboardScore(4)">+4</button>
-                        <button class="score-btn" onclick="addScoreboardScore(5)">+5</button>
-                        <button class="score-btn" onclick="addScoreboardScore(6)">+6</button>
-                        <button class="score-btn" onclick="addScoreboardScore(8)">+8</button>
-                        <button class="score-btn" onclick="addScoreboardScore(10)">+10</button>
-                        <button class="score-btn" onclick="addScoreboardScore(12)">+12</button>
-                        <button class="score-btn" onclick="addScoreboardScore(15)">+15</button>
-                        <button class="score-btn" onclick="addScoreboardScore(20)">+20</button>
-                        <button class="score-btn" onclick="undoLastScoreboardScore()">↶ Undo</button>
+                    <h3 class="section-title">🎲 Traditional Cribbage Board (121 Points)</h3>
+                    <div class="traditional-board">
+                        <div class="board-lanes" id="scoreboardCribbageBoard">
+                            <!-- Board will be generated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Score Confirmation -->
+                <div class="score-confirmation hidden" id="scoreConfirmation">
+                    <div>
+                        <strong id="confirmPlayerName">Player</strong> wants to score 
+                        <span class="points-scored" id="pointsScored">0</span> points
+                    </div>
+                    <div>Moving from <span id="fromScore">0</span> to <span id="toScore">0</span></div>
+                    <div class="confirmation-buttons">
+                        <button class="confirm-btn accept" onclick="confirmScore()">✓ Confirm</button>
+                        <button class="confirm-btn cancel" onclick="cancelScore()">✗ Cancel</button>
+                        <button class="confirm-btn cancel" onclick="undoLastScoreboardScore()">↶ Undo Last</button>
                     </div>
                 </div>
 
@@ -2281,6 +2376,7 @@
             player1: {
                 name: 'Colin',
                 score: 0,
+                previousScore: 0,
                 corners: 0,
                 wins: 0,
                 gamesPlayed: 0,
@@ -2289,6 +2385,7 @@
             player2: {
                 name: 'Holly', 
                 score: 0,
+                previousScore: 0,
                 corners: 0,
                 wins: 0,
                 gamesPlayed: 0,
@@ -2298,6 +2395,7 @@
             gameActive: false,
             gameHistory: [],
             lastMove: null,
+            pendingMove: null,
             statistics: {
                 totalGames: 0,
                 totalSkunks: 0,
@@ -2307,54 +2405,108 @@
             }
         };
 
-        // Create the cribbage board (121 holes)
+        // Create traditional cribbage board layout
         function createScoreboardBoard() {
             const board = document.getElementById('scoreboardCribbageBoard');
             if (!board) return;
             
             board.innerHTML = '';
             
-            for (let i = 1; i <= 121; i++) {
-                const hole = document.createElement('div');
-                hole.className = 'scoreboard-hole';
-                hole.id = `scoreboard-hole-${i}`;
-                
-                // Mark corner positions (30, 60, 90, 120)
-                if (i === 30 || i === 60 || i === 90 || i === 120) {
-                    hole.classList.add('corner');
-                }
-                
-                hole.addEventListener('click', () => moveScoreboardPlayerToHole(i));
-                board.appendChild(hole);
+            // Create 4 lanes of 30 holes each, plus 1 finish hole
+            // Layout: 0-30, 31-60, 61-90, 91-120, 121
+            
+            // Lane 1: 1-30 (left to right)
+            createBoardLane(board, 1, 30, false);
+            
+            // Lane 2: 31-60 (right to left)
+            createBoardLane(board, 31, 60, true);
+            
+            // Lane 3: 61-90 (left to right)  
+            createBoardLane(board, 61, 90, false);
+            
+            // Lane 4: 91-120 (right to left)
+            createBoardLane(board, 91, 120, true);
+            
+            // Finish lane: 121 (center)
+            createFinishLane(board);
+        }
+        
+        function createBoardLane(parent, start, end, reverse) {
+            const lane = document.createElement('div');
+            lane.className = 'board-lane';
+            
+            const holes = [];
+            for (let i = start; i <= end; i++) {
+                holes.push(i);
             }
+            
+            if (reverse) holes.reverse();
+            
+            // Create sections of 5 holes each
+            for (let i = 0; i < holes.length; i += 5) {
+                const section = document.createElement('div');
+                section.className = 'lane-section';
+                
+                const sectionHoles = holes.slice(i, i + 5);
+                if (reverse) sectionHoles.reverse();
+                
+                sectionHoles.forEach(holeNum => {
+                    const hole = document.createElement('div');
+                    hole.className = 'scoreboard-hole';
+                    hole.id = `scoreboard-hole-${holeNum}`;
+                    hole.textContent = holeNum;
+                    hole.style.fontSize = '0.7em';
+                    hole.style.color = '#fff';
+                    hole.style.fontWeight = 'bold';
+                    hole.style.display = 'flex';
+                    hole.style.alignItems = 'center';
+                    hole.style.justifyContent = 'center';
+                    
+                    // Mark corner positions
+                    if (holeNum === 30 || holeNum === 60 || holeNum === 90 || holeNum === 120) {
+                        hole.classList.add('corner');
+                    }
+                    
+                    hole.addEventListener('click', () => handleHoleClick(holeNum));
+                    section.appendChild(hole);
+                });
+                
+                lane.appendChild(section);
+            }
+            
+            parent.appendChild(lane);
+        }
+        
+        function createFinishLane(parent) {
+            const lane = document.createElement('div');
+            lane.className = 'board-lane';
+            lane.style.justifyContent = 'center';
+            
+            const section = document.createElement('div');
+            section.className = 'lane-section';
+            
+            const hole = document.createElement('div');
+            hole.className = 'scoreboard-hole';
+            hole.id = 'scoreboard-hole-121';
+            hole.textContent = '121';
+            hole.style.fontSize = '0.8em';
+            hole.style.color = '#fff';
+            hole.style.fontWeight = 'bold';
+            hole.style.display = 'flex';
+            hole.style.alignItems = 'center';
+            hole.style.justifyContent = 'center';
+            hole.style.background = '#ffd700';
+            hole.style.border = '3px solid #ffed4e';
+            hole.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.8)';
+            
+            hole.addEventListener('click', () => handleHoleClick(121));
+            section.appendChild(hole);
+            lane.appendChild(section);
+            parent.appendChild(lane);
         }
 
-        // Move player to specific hole (for manual adjustment)
-        function moveScoreboardPlayerToHole(position) {
-            if (!scoreboardGameState.currentPlayer) {
-                alert('Please select a player first by clicking their score card!');
-                return;
-            }
-            
-            const player = scoreboardGameState.currentPlayer === 1 ? scoreboardGameState.player1 : scoreboardGameState.player2;
-            const oldScore = player.score;
-            player.score = position;
-            
-            // Record move for undo
-            scoreboardGameState.lastMove = {
-                player: scoreboardGameState.currentPlayer,
-                oldScore: oldScore,
-                newScore: position,
-                pointsAdded: position - oldScore
-            };
-            
-            updateScoreboardBoard();
-            checkForScoreboardCornerAndWin(scoreboardGameState.currentPlayer, oldScore, player.score);
-            saveScoreboardGameData();
-        }
-
-        // Add score to current player
-        function addScoreboardScore(points) {
+        // Handle hole click - traditional two-peg system
+        function handleHoleClick(position) {
             if (!scoreboardGameState.currentPlayer) {
                 alert('Please select a player first by clicking their score card!');
                 return;
@@ -2366,28 +2518,125 @@
             }
             
             const player = scoreboardGameState.currentPlayer === 1 ? scoreboardGameState.player1 : scoreboardGameState.player2;
-            const oldScore = player.score;
-            const newScore = Math.min(oldScore + points, 121);
+            const currentScore = player.score;
+            const pointsToScore = position - currentScore;
             
-            player.score = newScore;
-            player.totalPoints += (newScore - oldScore);
+            // Validation: Can't go backwards or stay same
+            if (pointsToScore <= 0) {
+                alert('You can only move forward on the board!');
+                return;
+            }
             
-            // Record move for undo
-            scoreboardGameState.lastMove = {
+            // Validation: Max 29 points per turn (highest single hand in cribbage)
+            if (pointsToScore > 29) {
+                alert(`Maximum 29 points per turn! You tried to score ${pointsToScore} points.`);
+                return;
+            }
+            
+            // Can't exceed 121
+            if (position > 121) {
+                alert('Score cannot exceed 121!');
+                return;
+            }
+            
+            // Show preview and confirmation
+            showScorePreview(position, pointsToScore);
+        }
+        
+        function showScorePreview(newPosition, pointsScored) {
+            // Clear any existing previews
+            clearScorePreview();
+            
+            // Highlight the target hole
+            const targetHole = document.getElementById(`scoreboard-hole-${newPosition}`);
+            if (targetHole) {
+                targetHole.classList.add('preview');
+            }
+            
+            // Store pending move
+            const player = scoreboardGameState.currentPlayer === 1 ? scoreboardGameState.player1 : scoreboardGameState.player2;
+            scoreboardGameState.pendingMove = {
                 player: scoreboardGameState.currentPlayer,
-                oldScore: oldScore,
-                newScore: newScore,
-                pointsAdded: points
+                playerName: player.name,
+                oldScore: player.score,
+                newScore: newPosition,
+                pointsScored: pointsScored
             };
             
+            // Show confirmation dialog
+            showConfirmationDialog();
+        }
+        
+        function clearScorePreview() {
+            document.querySelectorAll('.scoreboard-hole.preview').forEach(hole => {
+                hole.classList.remove('preview');
+            });
+        }
+        
+        function showConfirmationDialog() {
+            const dialog = document.getElementById('scoreConfirmation');
+            const playerName = document.getElementById('confirmPlayerName');
+            const pointsScored = document.getElementById('pointsScored');
+            const fromScore = document.getElementById('fromScore');
+            const toScore = document.getElementById('toScore');
+            
+            if (dialog && scoreboardGameState.pendingMove) {
+                playerName.textContent = scoreboardGameState.pendingMove.playerName;
+                pointsScored.textContent = scoreboardGameState.pendingMove.pointsScored;
+                fromScore.textContent = scoreboardGameState.pendingMove.oldScore;
+                toScore.textContent = scoreboardGameState.pendingMove.newScore;
+                
+                dialog.classList.remove('hidden');
+            }
+        }
+        
+        function confirmScore() {
+            if (!scoreboardGameState.pendingMove) return;
+            
+            const move = scoreboardGameState.pendingMove;
+            const player = move.player === 1 ? scoreboardGameState.player1 : scoreboardGameState.player2;
+            
+            // Store previous score for two-peg system
+            player.previousScore = player.score;
+            player.score = move.newScore;
+            player.totalPoints += move.pointsScored;
+            
+            // Record for undo
+            scoreboardGameState.lastMove = {
+                player: move.player,
+                oldScore: move.oldScore,
+                oldPreviousScore: player.previousScore,
+                newScore: move.newScore,
+                pointsAdded: move.pointsScored
+            };
+            
+            // Clear pending move
+            scoreboardGameState.pendingMove = null;
+            hideConfirmationDialog();
+            clearScorePreview();
+            
+            // Update display and check for win
             updateScoreboardDisplay();
             updateScoreboardBoard();
-            checkForScoreboardCornerAndWin(scoreboardGameState.currentPlayer, oldScore, newScore);
+            checkForScoreboardCornerAndWin(move.player, move.oldScore, move.newScore);
             saveScoreboardGameData();
             
             // Auto-switch to other player
             scoreboardGameState.currentPlayer = scoreboardGameState.currentPlayer === 1 ? 2 : 1;
             updateScoreboardDisplay();
+        }
+        
+        function cancelScore() {
+            scoreboardGameState.pendingMove = null;
+            hideConfirmationDialog();
+            clearScorePreview();
+        }
+        
+        function hideConfirmationDialog() {
+            const dialog = document.getElementById('scoreConfirmation');
+            if (dialog) {
+                dialog.classList.add('hidden');
+            }
         }
 
         // Undo last score
@@ -2400,19 +2649,30 @@
             const lastMove = scoreboardGameState.lastMove;
             const player = lastMove.player === 1 ? scoreboardGameState.player1 : scoreboardGameState.player2;
             
+            // Restore previous scores
+            const currentScore = player.score;
             player.score = lastMove.oldScore;
+            if (lastMove.oldPreviousScore !== undefined) {
+                player.previousScore = lastMove.oldPreviousScore;
+            }
             player.totalPoints -= lastMove.pointsAdded;
             
             // Undo corners if applicable
-            if (lastMove.oldScore < 30 && lastMove.newScore >= 30) player.corners--;
-            if (lastMove.oldScore < 60 && lastMove.newScore >= 60) player.corners--;
-            if (lastMove.oldScore < 90 && lastMove.newScore >= 90) player.corners--;
-            if (lastMove.oldScore < 120 && lastMove.newScore >= 120) player.corners--;
+            if (lastMove.oldScore < 30 && currentScore >= 30) player.corners--;
+            if (lastMove.oldScore < 60 && currentScore >= 60) player.corners--;
+            if (lastMove.oldScore < 90 && currentScore >= 90) player.corners--;
+            if (lastMove.oldScore < 120 && currentScore >= 120) player.corners--;
             
             scoreboardGameState.lastMove = null;
+            
+            // Cancel any pending moves
+            cancelScore();
+            
             updateScoreboardDisplay();
             updateScoreboardBoard();
             saveScoreboardGameData();
+            
+            showScoreboardCelebration(`↶ Undid ${player.name}'s last move`);
         }
 
         // Check for corners and win
@@ -2488,14 +2748,21 @@
             scoreboardGameState.player1.name = document.getElementById('scoreboardPlayer1Name').value || 'Player 1';
             scoreboardGameState.player2.name = document.getElementById('scoreboardPlayer2Name').value || 'Player 2';
             
-            // Reset scores
+            // Reset scores and pegs
             scoreboardGameState.player1.score = 0;
+            scoreboardGameState.player1.previousScore = 0;
             scoreboardGameState.player2.score = 0;
+            scoreboardGameState.player2.previousScore = 0;
             scoreboardGameState.player1.corners = 0;
             scoreboardGameState.player2.corners = 0;
             scoreboardGameState.currentPlayer = 1;
             scoreboardGameState.gameActive = true;
             scoreboardGameState.lastMove = null;
+            scoreboardGameState.pendingMove = null;
+            
+            // Cancel any confirmation dialogs
+            hideConfirmationDialog();
+            clearScorePreview();
             
             updateScoreboardDisplay();
             updateScoreboardBoard();
@@ -2553,27 +2820,62 @@
             updateScoreboardDisplay();
         }
 
-        // Update board display
+        // Update board display with two-peg system
         function updateScoreboardBoard() {
             // Clear all pegs
             document.querySelectorAll('.scoreboard-peg').forEach(peg => peg.remove());
             
-            // Add player pegs
-            if (scoreboardGameState.player1.score > 0) {
-                const hole1 = document.getElementById(`scoreboard-hole-${scoreboardGameState.player1.score}`);
-                if (hole1) {
-                    const peg1 = document.createElement('div');
-                    peg1.className = 'scoreboard-peg player1';
-                    hole1.appendChild(peg1);
+            // Player 1 pegs
+            const player1 = scoreboardGameState.player1;
+            
+            // Player 1 previous peg (if exists and different from current)
+            if (player1.previousScore > 0 && player1.previousScore !== player1.score) {
+                const prevHole1 = document.getElementById(`scoreboard-hole-${player1.previousScore}`);
+                if (prevHole1) {
+                    const prevPeg1 = document.createElement('div');
+                    prevPeg1.className = 'scoreboard-peg player1 previous';
+                    prevPeg1.title = `${player1.name}'s previous score: ${player1.previousScore}`;
+                    prevHole1.appendChild(prevPeg1);
                 }
             }
             
-            if (scoreboardGameState.player2.score > 0) {
-                const hole2 = document.getElementById(`scoreboard-hole-${scoreboardGameState.player2.score}`);
-                if (hole2) {
-                    const peg2 = document.createElement('div');
-                    peg2.className = 'scoreboard-peg player2';
-                    hole2.appendChild(peg2);
+            // Player 1 current peg
+            if (player1.score > 0) {
+                const currentHole1 = document.getElementById(`scoreboard-hole-${player1.score}`);
+                if (currentHole1) {
+                    const currentPeg1 = document.createElement('div');
+                    currentPeg1.className = 'scoreboard-peg player1 current';
+                    currentPeg1.title = `${player1.name}'s current score: ${player1.score}`;
+                    currentHole1.appendChild(currentPeg1);
+                }
+            }
+            
+            // Player 2 pegs
+            const player2 = scoreboardGameState.player2;
+            
+            // Player 2 previous peg (if exists and different from current)
+            if (player2.previousScore > 0 && player2.previousScore !== player2.score) {
+                const prevHole2 = document.getElementById(`scoreboard-hole-${player2.previousScore}`);
+                if (prevHole2) {
+                    const prevPeg2 = document.createElement('div');
+                    prevPeg2.className = 'scoreboard-peg player2 previous';
+                    prevPeg2.title = `${player2.name}'s previous score: ${player2.previousScore}`;
+                    // Offset slightly so both pegs are visible if in same hole
+                    prevPeg2.style.transform = 'translate(-40%, -50%)';
+                    prevHole2.appendChild(prevPeg2);
+                }
+            }
+            
+            // Player 2 current peg
+            if (player2.score > 0) {
+                const currentHole2 = document.getElementById(`scoreboard-hole-${player2.score}`);
+                if (currentHole2) {
+                    const currentPeg2 = document.createElement('div');
+                    currentPeg2.className = 'scoreboard-peg player2 current';
+                    currentPeg2.title = `${player2.name}'s current score: ${player2.score}`;
+                    // Offset slightly so both pegs are visible if in same hole
+                    currentPeg2.style.transform = 'translate(-60%, -50%)';
+                    currentHole2.appendChild(currentPeg2);
                 }
             }
         }
@@ -2645,18 +2947,22 @@
             if (confirm('This will reset ALL game data including statistics. Are you sure?')) {
                 localStorage.removeItem('cribbageScoreboard');
                 scoreboardGameState = {
-                    player1: { name: 'Colin', score: 0, corners: 0, wins: 0, gamesPlayed: 0, totalPoints: 0 },
-                    player2: { name: 'Holly', score: 0, corners: 0, wins: 0, gamesPlayed: 0, totalPoints: 0 },
+                    player1: { name: 'Colin', score: 0, previousScore: 0, corners: 0, wins: 0, gamesPlayed: 0, totalPoints: 0 },
+                    player2: { name: 'Holly', score: 0, previousScore: 0, corners: 0, wins: 0, gamesPlayed: 0, totalPoints: 0 },
                     currentPlayer: null,
                     gameActive: false,
                     gameHistory: [],
                     lastMove: null,
+                    pendingMove: null,
                     statistics: { totalGames: 0, totalSkunks: 0, totalDoubleSkunks: 0, totalCorners: 0, perfectGames: 0 }
                 };
                 const player1Input = document.getElementById('scoreboardPlayer1Name');
                 const player2Input = document.getElementById('scoreboardPlayer2Name');
                 if (player1Input) player1Input.value = 'Colin';
                 if (player2Input) player2Input.value = 'Holly';
+                
+                hideConfirmationDialog();
+                clearScorePreview();
                 updateScoreboardDisplay();
                 updateScoreboardBoard();
                 showScoreboardCelebration('🗑️ All data reset!');

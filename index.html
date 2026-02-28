@@ -996,8 +996,8 @@
         
         // CRIBBAGE GAME STATE
         let gameState = {
-            player1: { name: 'You', score: 0, hand: [], discarded: [] },
-            player2: { name: 'Computer', score: 0, hand: [], discarded: [] },
+            player1: { name: 'You', score: 0, hand: [], originalHand: [], discarded: [] },
+            player2: { name: 'Computer', score: 0, hand: [], originalHand: [], discarded: [] },
             dealer: 1, // 1 or 2
             phase: 'setup', // setup, deal, discard, peg, count, gameOver
             deck: [],
@@ -2268,8 +2268,8 @@
             const player2Name = document.getElementById('gamePlayer2Name').value.trim() || 'Computer';
             
             gameState = {
-                player1: { name: player1Name, score: 0, hand: [], discarded: [] },
-                player2: { name: player2Name, score: 0, hand: [], discarded: [] },
+                player1: { name: player1Name, score: 0, hand: [], originalHand: [], discarded: [] },
+                player2: { name: player2Name, score: 0, hand: [], originalHand: [], discarded: [] },
                 dealer: Math.random() < 0.5 ? 1 : 2,
                 phase: 'deal',
                 deck: [],
@@ -2341,7 +2341,8 @@
                     phaseTitle.textContent = '🃏 Discard Phase';
                     phaseInstruction.textContent = 'Select 2 cards to discard to the crib';
                     gameMessage.classList.remove('hidden');
-                    gameMessage.textContent = `${gameState.dealer === 1 ? gameState.player1.name : gameState.player2.name} is the dealer`;
+                    const dealerName = gameState.dealer === 1 ? gameState.player1.name : gameState.player2.name;
+                    gameMessage.textContent = `${dealerName} ${dealerName === 'You' ? 'are' : 'is'} the dealer`;
                     document.getElementById('confirmDiscardButton').classList.remove('hidden');
                     break;
                 case 'peg':
@@ -2352,8 +2353,10 @@
                     break;
                 case 'count':
                     phaseTitle.textContent = '🔢 Counting Phase';
-                    phaseInstruction.textContent = 'Scoring hands and crib...';
+                    phaseInstruction.textContent = 'Both hands are now scored along with the crib. Review the scores below!';
                     document.getElementById('nextHandButton').classList.remove('hidden');
+                    gameMessage.classList.remove('hidden');
+                    gameMessage.textContent = 'Both players\' original 4-card hands are shown for scoring';
                     break;
                 case 'gameOver':
                     phaseTitle.textContent = '🏆 Game Over!';
@@ -2388,11 +2391,13 @@
                     player1HandEl.appendChild(cardEl);
                 });
                 
-                // Show computer hand only in certain phases (for demo purposes)
+                // Show computer hand during counting and game over phases
                 if (gameState.phase === 'count' || gameState.phase === 'gameOver') {
                     document.getElementById('player2HandArea').classList.remove('hidden');
                     player2HandEl.innerHTML = '';
-                    gameState.player2.hand.forEach((card, index) => {
+                    // Show computer's original 4-card hand for scoring
+                    const handsToShow = gameState.phase === 'count' ? gameState.player2.originalHand : gameState.player2.hand;
+                    handsToShow.forEach((card, index) => {
                         const cardEl = createCardElement(card, index, 'player2');
                         player2HandEl.appendChild(cardEl);
                     });
@@ -2466,6 +2471,10 @@
                 gameState.player2.hand = gameState.player2.hand.filter(c => c !== card);
             });
             
+            // Store original hands (4 cards each after discarding) for scoring later
+            gameState.player1.originalHand = [...gameState.player1.hand];
+            gameState.player2.originalHand = [...gameState.player2.hand];
+            
             selectedCards = [];
             document.getElementById('confirmDiscardButton').classList.add('hidden');
             
@@ -2475,6 +2484,11 @@
             displayGameState();
             
             showMessage('Discard complete! Starting pegging phase...', 'success', 2000);
+            
+            // If computer goes first in pegging, trigger AI
+            if (gameState.currentPlayer === 2) {
+                setTimeout(computerPeggingTurn, 2500);
+            }
         }
         
         function getComputerDiscards() {
@@ -2625,23 +2639,28 @@
         }
         
         function countHands() {
-            // Count player 1 hand + remaining cards
-            const player1Points = scoreHandComplete(gameState.player1.hand, gameState.starter);
+            // Restore hands to original 4-card hands for scoring
+            gameState.player1.hand = [...gameState.player1.originalHand];
+            gameState.player2.hand = [...gameState.player2.originalHand];
+            
+            // Count player 1 hand (original 4 cards)
+            const player1Points = scoreHandComplete(gameState.player1.originalHand, gameState.starter);
             gameState.player1.score += player1Points;
             
-            // Count player 2 hand  
-            const player2Points = scoreHandComplete(gameState.player2.hand, gameState.starter);
+            // Count player 2 hand (original 4 cards)
+            const player2Points = scoreHandComplete(gameState.player2.originalHand, gameState.starter);
             gameState.player2.score += player2Points;
             
             // Count crib (goes to dealer)
             const cribPoints = scoreHandComplete(gameState.crib, gameState.starter);
+            const dealerName = gameState.dealer === 1 ? gameState.player1.name : gameState.player2.name;
             if (gameState.dealer === 1) {
                 gameState.player1.score += cribPoints;
             } else {
                 gameState.player2.score += cribPoints;
             }
             
-            showMessage(`Hand scores: ${gameState.player1.name}: ${player1Points}, ${gameState.player2.name}: ${player2Points}, Crib: ${cribPoints}`, 'success', 4000);
+            showMessage(`📊 Hand Scores: ${gameState.player1.name}: ${player1Points} points, ${gameState.player2.name}: ${player2Points} points, Crib (${dealerName}): ${cribPoints} points`, 'success', 5000);
             updateScoreDisplay();
             
             // Check for win
@@ -2766,6 +2785,12 @@
             gameState.peggingCards = [];
             gameState.crib = [];
             gameState.currentPlayer = 1;
+            
+            // Clear hands
+            gameState.player1.hand = [];
+            gameState.player1.originalHand = [];
+            gameState.player2.hand = [];
+            gameState.player2.originalHand = [];
             
             // Hide various UI elements
             document.getElementById('nextHandButton').classList.add('hidden');

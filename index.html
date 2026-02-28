@@ -156,6 +156,175 @@
             outline: none;
         }
         
+        /* CARD ANIMATIONS */
+        .card.dealing {
+            animation: dealCard 0.5s ease-out forwards;
+            opacity: 0;
+            transform: translateX(-100px) rotate(-10deg);
+        }
+        
+        .card.playing {
+            animation: playCard 0.8s ease-out forwards;
+            z-index: 10;
+        }
+        
+        .card.scoring {
+            animation: scoreHighlight 1s ease-in-out;
+        }
+        
+        .card.discarding {
+            animation: discardCard 0.6s ease-in forwards;
+        }
+        
+        @keyframes dealCard {
+            0% {
+                opacity: 0;
+                transform: translateX(-100px) rotate(-10deg) scale(0.8);
+            }
+            50% {
+                opacity: 0.7;
+                transform: translateX(0) rotate(5deg) scale(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) rotate(0deg) scale(1);
+            }
+        }
+        
+        @keyframes playCard {
+            0% {
+                transform: translateY(0) scale(1) rotate(0deg);
+            }
+            25% {
+                transform: translateY(-20px) scale(1.2) rotate(-5deg);
+            }
+            50% {
+                transform: translateY(-40px) scale(1.3) rotate(0deg);
+            }
+            75% {
+                transform: translateY(-20px) scale(1.1) rotate(2deg);
+            }
+            100% {
+                transform: translateY(-60px) scale(0.9) rotate(0deg);
+                opacity: 0.8;
+            }
+        }
+        
+        @keyframes scoreHighlight {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 rgba(255,215,0,0);
+            }
+            25% {
+                transform: scale(1.1);
+                box-shadow: 0 0 20px rgba(255,215,0,0.8);
+            }
+            50% {
+                transform: scale(1.2);
+                box-shadow: 0 0 30px rgba(255,215,0,1);
+            }
+            75% {
+                transform: scale(1.1);
+                box-shadow: 0 0 20px rgba(255,215,0,0.8);
+            }
+        }
+        
+        @keyframes discardCard {
+            0% {
+                transform: translateY(0) scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-30px) scale(1.1) rotate(-10deg);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-80px) scale(0.8) rotate(-20deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Score celebration animations */
+        .score-celebration {
+            animation: scoreCelebration 1.5s ease-out;
+        }
+        
+        @keyframes scoreCelebration {
+            0% {
+                transform: scale(1);
+                color: gold;
+            }
+            25% {
+                transform: scale(1.3);
+                color: #FFD700;
+                text-shadow: 0 0 10px rgba(255,215,0,0.8);
+            }
+            50% {
+                transform: scale(1.5) rotate(5deg);
+                color: #FFA500;
+                text-shadow: 0 0 20px rgba(255,165,0,1);
+            }
+            75% {
+                transform: scale(1.2) rotate(-2deg);
+                color: #FFD700;
+                text-shadow: 0 0 15px rgba(255,215,0,0.6);
+            }
+            100% {
+                transform: scale(1);
+                color: gold;
+                text-shadow: none;
+            }
+        }
+        
+        /* Peg movement animation */
+        .scoreboard-peg {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            transition: all 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+            animation: pegMove 0.8s ease-out;
+        }
+        
+        @keyframes pegMove {
+            0% { 
+                transform: translate(-50%, -150%) scale(0.5) rotate(0deg);
+                opacity: 0;
+            }
+            30% {
+                transform: translate(-50%, -80%) scale(1.3) rotate(180deg);
+                opacity: 0.8;
+            }
+            60% {
+                transform: translate(-50%, -40%) scale(1.1) rotate(270deg);
+                opacity: 1;
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(1) rotate(360deg);
+                opacity: 1;
+            }
+        }
+        
+        /* Hand reveal animation */
+        .hand-reveal {
+            animation: handReveal 1s ease-out;
+        }
+        
+        @keyframes handReveal {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
         .card.selected {
             border: 4px solid #FF4444;
             box-shadow: 0 0 25px rgba(255,68,68,0.9);
@@ -1569,13 +1738,19 @@
             const myHand = p2pState.isHost ? p2pState.gameState.player1.hand : p2pState.gameState.player2.hand;
             
             myHand.forEach((card, index) => {
-                const cardEl = createCardElement(card, index, 'p2p');
+                const cardEl = createCardElementAnimated(card, index, 'p2p');
                 if (p2pState.myTurn && (p2pState.gameState.phase === 'discard' || p2pState.gameState.phase === 'peg')) {
                     cardEl.classList.add('selectable');
                     cardEl.onclick = () => selectP2PCard(index);
                 }
                 handEl.appendChild(cardEl);
             });
+            
+            // Animate dealing cards for P2P
+            if (p2pState.gameState.phase === 'discard') {
+                animateDealCards(handEl, myHand, 150);
+                animateHandReveal(document.getElementById('p2pPlayerHandArea'));
+            }
         }
         
         function displayP2PCard(containerId, card, isStarter = false) {
@@ -1726,8 +1901,16 @@
             if (points > 0) {
                 if (isHost) {
                     p2pState.gameState.player1.score += points;
+                    setTimeout(() => {
+                        const scoreEl = document.getElementById('p2pPlayer1Score');
+                        triggerScoreCelebration(scoreEl, points);
+                    }, 100);
                 } else {
                     p2pState.gameState.player2.score += points;
+                    setTimeout(() => {
+                        const scoreEl = document.getElementById('p2pPlayer2Score');
+                        triggerScoreCelebration(scoreEl, points);
+                    }, 100);
                 }
                 showMessage(`${isHost ? p2pState.gameState.player1.name : p2pState.gameState.player2.name} scores ${points} points!`, 'success', 2000);
             }
@@ -1999,6 +2182,141 @@
             document.getElementById('hostName').value = '';
             document.getElementById('guestName').value = '';
             document.getElementById('roomCode').value = '';
+        }
+        
+        // ===== CARD ANIMATION SYSTEM =====
+        
+        function animateDealCards(containerEl, cards, delay = 100) {
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    const cardEl = containerEl.children[index];
+                    if (cardEl) {
+                        cardEl.classList.add('dealing');
+                        // Remove animation class after completion
+                        setTimeout(() => {
+                            cardEl.classList.remove('dealing');
+                        }, 500);
+                    }
+                }, index * delay);
+            });
+        }
+        
+        function animateCardPlay(cardEl, callback) {
+            if (!cardEl) return;
+            
+            cardEl.classList.add('playing');
+            
+            // Execute callback after animation
+            setTimeout(() => {
+                cardEl.classList.remove('playing');
+                if (callback) callback();
+            }, 800);
+        }
+        
+        function animateCardDiscard(cardEl, callback) {
+            if (!cardEl) return;
+            
+            cardEl.classList.add('discarding');
+            
+            setTimeout(() => {
+                cardEl.style.display = 'none';
+                if (callback) callback();
+            }, 600);
+        }
+        
+        function animateScoreHighlight(scoreEl, points) {
+            if (!scoreEl) return;
+            
+            scoreEl.classList.add('score-celebration');
+            
+            // Add floating points effect
+            const floatingPoints = document.createElement('div');
+            floatingPoints.textContent = `+${points}`;
+            floatingPoints.style.cssText = `
+                position: absolute;
+                top: -20px;
+                left: 50%;
+                transform: translateX(-50%);
+                color: #FFD700;
+                font-size: 1.5em;
+                font-weight: bold;
+                pointer-events: none;
+                z-index: 100;
+                animation: floatUp 2s ease-out forwards;
+            `;
+            
+            // Add floating animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes floatUp {
+                    0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                    100% { opacity: 0; transform: translateX(-50%) translateY(-50px); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            scoreEl.style.position = 'relative';
+            scoreEl.appendChild(floatingPoints);
+            
+            setTimeout(() => {
+                scoreEl.classList.remove('score-celebration');
+                if (floatingPoints.parentNode) {
+                    floatingPoints.parentNode.removeChild(floatingPoints);
+                }
+            }, 1500);
+        }
+        
+        function animateHandReveal(containerEl) {
+            if (containerEl) {
+                containerEl.classList.add('hand-reveal');
+                setTimeout(() => {
+                    containerEl.classList.remove('hand-reveal');
+                }, 1000);
+            }
+        }
+        
+        function createCardElementAnimated(card, index, player) {
+            const cardEl = createCardElement(card, index, player);
+            // Card starts invisible for deal animation
+            cardEl.style.opacity = '0';
+            cardEl.style.transform = 'translateX(-100px) rotate(-10deg)';
+            return cardEl;
+        }
+        
+        function triggerScoreCelebration(playerScoreEl, points) {
+            // Animate the score display
+            animateScoreHighlight(playerScoreEl, points);
+            
+            // Add screen flash effect for big scores
+            if (points >= 15) {
+                const flash = document.createElement('div');
+                flash.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 70%);
+                    pointer-events: none;
+                    z-index: 999;
+                    animation: flashEffect 0.6s ease-out;
+                `;
+                
+                const flashStyle = document.createElement('style');
+                flashStyle.textContent = `
+                    @keyframes flashEffect {
+                        0% { opacity: 0; }
+                        50% { opacity: 1; }
+                        100% { opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(flashStyle);
+                document.body.appendChild(flash);
+                
+                setTimeout(() => {
+                    if (flash.parentNode) flash.parentNode.removeChild(flash);
+                }, 600);
+            }
         }
         
         // ===== ENHANCED HAND SCORER FUNCTIONS =====
@@ -3232,13 +3550,19 @@
                 // Show player 1 hand (always visible to human player)
                 player1HandEl.innerHTML = '';
                 gameState.player1.hand.forEach((card, index) => {
-                    const cardEl = createCardElement(card, index, 'player1');
+                    const cardEl = createCardElementAnimated(card, index, 'player1');
                     if (gameState.phase === 'discard' || gameState.phase === 'peg') {
                         cardEl.classList.add('selectable');
                         cardEl.onclick = () => selectGameCard(1, index);
                     }
                     player1HandEl.appendChild(cardEl);
                 });
+                
+                // Animate dealing cards
+                if (gameState.phase === 'discard') {
+                    animateDealCards(player1HandEl, gameState.player1.hand, 150);
+                    animateHandReveal(document.getElementById('player1HandArea'));
+                }
                 
                 // Show computer hand during counting and game over phases
                 if (gameState.phase === 'count' || gameState.phase === 'gameOver') {
@@ -3250,6 +3574,7 @@
                         const cardEl = createCardElement(card, index, 'player2');
                         player2HandEl.appendChild(cardEl);
                     });
+                    animateHandReveal(document.getElementById('player2HandArea'));
                 }
             }
         }
@@ -3383,8 +3708,17 @@
             if (points > 0) {
                 if (player === 1) {
                     gameState.player1.score += points;
+                    // Animate score celebration
+                    setTimeout(() => {
+                        const scoreEl = document.getElementById('player1Score');
+                        triggerScoreCelebration(scoreEl, points);
+                    }, 100);
                 } else {
                     gameState.player2.score += points;
+                    setTimeout(() => {
+                        const scoreEl = document.getElementById('player2Score');
+                        triggerScoreCelebration(scoreEl, points);
+                    }, 100);
                 }
                 showMessage(`${player === 1 ? gameState.player1.name : gameState.player2.name} scores ${points} points!`, 'success', 2000);
                 updateScoreDisplay();
@@ -3511,6 +3845,28 @@
             } else {
                 gameState.player2.score += cribPoints;
             }
+            
+            // Animate scoring celebrations with delays for dramatic effect
+            setTimeout(() => {
+                if (player1Points > 0) {
+                    const scoreEl = document.getElementById('player1Score');
+                    triggerScoreCelebration(scoreEl, player1Points);
+                }
+            }, 500);
+            
+            setTimeout(() => {
+                if (player2Points > 0) {
+                    const scoreEl = document.getElementById('player2Score');
+                    triggerScoreCelebration(scoreEl, player2Points);
+                }
+            }, 1000);
+            
+            setTimeout(() => {
+                if (cribPoints > 0) {
+                    const scoreEl = gameState.dealer === 1 ? document.getElementById('player1Score') : document.getElementById('player2Score');
+                    triggerScoreCelebration(scoreEl, cribPoints);
+                }
+            }, 1500);
             
             // Display detailed scoring
             displayHandScores(player1Points, player1Breakdown, player2Points, player2Breakdown, cribPoints, cribBreakdown, dealerName);

@@ -48,34 +48,6 @@
             color: #ddd;
             font-size: clamp(1em, 4vw, 1.3em);
             opacity: 0.9;
-            margin-bottom: 15px;
-        }
-        
-        /* Prominent Play Button */
-        .play-button {
-            background: linear-gradient(145deg, #FF6B6B, #FF5252);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            font-size: 2em;
-            font-weight: bold;
-            padding: 15px 40px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            box-shadow: 0 8px 25px rgba(255,107,107,0.4);
-            margin: 10px;
-            min-height: 60px;
-        }
-        
-        .play-button:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 15px 40px rgba(255,107,107,0.6);
-        }
-        
-        .play-button:active {
-            transform: translateY(-1px) scale(1.02);
         }
         
         /* Navigation - Enhanced Mobile Touch Targets */
@@ -559,7 +531,6 @@
         <div class="app-header">
             <h1 class="app-title">🃏 Cribbage Pro</h1>
             <p class="app-subtitle">🔧 Debug Fixed Version - Complete Cribbage Companion</p>
-            <button class="play-button" onclick="startCribbageGame()">🎮 PLAY CRIBBAGE</button>
         </div>
         
         <!-- Navigation -->
@@ -2147,7 +2118,6 @@
             showTab('play');
             const playTab = document.querySelector('[onclick="showTab(\'play\')"]');
             if (playTab) playTab.classList.add('active');
-            showMessage('🎮 Welcome to Play Cribbage mode!', 'success', 2000);
         }
         
         function initializeCribbageGame() {

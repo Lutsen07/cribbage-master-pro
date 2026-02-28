@@ -804,6 +804,11 @@
         <div class="app-header">
             <h1 class="app-title">🃏 Cribbage Pro</h1>
             <p class="app-subtitle">🔧 Debug Fixed Version - Complete Cribbage Companion</p>
+            <div style="margin-top: 10px;">
+                <button onclick="SoundEngine.toggle()" class="nav-tab" style="font-size: 0.9em; padding: 8px 16px;" id="soundToggle">
+                    🔊 Sound ON
+                </button>
+            </div>
         </div>
         
         <!-- Navigation -->
@@ -2184,6 +2189,125 @@
             document.getElementById('roomCode').value = '';
         }
         
+        // ===== SOUND EFFECTS SYSTEM =====
+        
+        const SoundEngine = {
+            enabled: true,
+            volume: 0.6,
+            
+            // Create audio context for better performance
+            init() {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                this.masterGain = this.audioContext.createGain();
+                this.masterGain.connect(this.audioContext.destination);
+                this.masterGain.gain.setValueAtTime(this.volume, this.audioContext.currentTime);
+            },
+            
+            // Generate card flip sound
+            playCardFlip(pitch = 440) {
+                if (!this.enabled || !this.audioContext) return;
+                
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.masterGain);
+                
+                oscillator.frequency.setValueAtTime(pitch, this.audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(pitch * 0.7, this.audioContext.currentTime + 0.1);
+                
+                gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.15);
+                
+                oscillator.type = 'triangle';
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.15);
+            },
+            
+            // Generate card dealing sound
+            playCardDeal(index = 0) {
+                const basePitch = 350 + (index * 20); // Ascending pitches
+                this.playCardFlip(basePitch);
+            },
+            
+            // Generate card play sound
+            playCardPlay(cardValue = 5) {
+                const pitch = 300 + (cardValue * 15);
+                this.playCardFlip(pitch);
+            },
+            
+            // Generate scoring sound
+            playScore(points) {
+                if (!this.enabled || !this.audioContext) return;
+                
+                const frequencies = [523, 659, 784]; // C-E-G chord
+                const duration = Math.min(0.5 + (points * 0.05), 1.0);
+                
+                frequencies.forEach((freq, i) => {
+                    setTimeout(() => {
+                        const oscillator = this.audioContext.createOscillator();
+                        const gainNode = this.audioContext.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(this.masterGain);
+                        
+                        oscillator.frequency.setValueAtTime(freq, this.audioContext.currentTime);
+                        gainNode.gain.setValueAtTime(0.2, this.audioContext.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+                        
+                        oscillator.type = 'sine';
+                        oscillator.start(this.audioContext.currentTime);
+                        oscillator.stop(this.audioContext.currentTime + duration);
+                    }, i * 100);
+                });
+            },
+            
+            // Generate win celebration sound
+            playWin() {
+                if (!this.enabled || !this.audioContext) return;
+                
+                const melody = [523, 659, 784, 1047]; // C-E-G-C octave
+                melody.forEach((freq, i) => {
+                    setTimeout(() => {
+                        this.playCardFlip(freq);
+                    }, i * 150);
+                });
+            },
+            
+            // Generate button click sound
+            playClick() {
+                this.playCardFlip(800);
+            },
+            
+            // Toggle sound on/off
+            toggle() {
+                this.enabled = !this.enabled;
+                const toggleBtn = document.getElementById('soundToggle');
+                if (toggleBtn) {
+                    toggleBtn.textContent = this.enabled ? '🔊 Sound ON' : '🔇 Sound OFF';
+                }
+                showMessage(`Sound ${this.enabled ? 'enabled' : 'disabled'}`, 'success', 1000);
+            },
+            
+            // Set volume (0.0 to 1.0)
+            setVolume(vol) {
+                this.volume = Math.max(0, Math.min(1, vol));
+                if (this.masterGain) {
+                    this.masterGain.gain.setValueAtTime(this.volume, this.audioContext.currentTime);
+                }
+            }
+        };
+        
+        // Initialize sound system
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize after user interaction (required by browsers)
+            document.addEventListener('click', () => {
+                if (!SoundEngine.audioContext) {
+                    SoundEngine.init();
+                }
+            }, { once: true });
+        });
+        
         // ===== CARD ANIMATION SYSTEM =====
         
         function animateDealCards(containerEl, cards, delay = 100) {
@@ -2192,6 +2316,8 @@
                     const cardEl = containerEl.children[index];
                     if (cardEl) {
                         cardEl.classList.add('dealing');
+                        // Play card deal sound
+                        SoundEngine.playCardDeal(index);
                         // Remove animation class after completion
                         setTimeout(() => {
                             cardEl.classList.remove('dealing');
@@ -2201,10 +2327,12 @@
             });
         }
         
-        function animateCardPlay(cardEl, callback) {
+        function animateCardPlay(cardEl, cardValue = 5, callback) {
             if (!cardEl) return;
             
             cardEl.classList.add('playing');
+            // Play card play sound
+            SoundEngine.playCardPlay(cardValue);
             
             // Execute callback after animation
             setTimeout(() => {
@@ -2284,6 +2412,9 @@
         }
         
         function triggerScoreCelebration(playerScoreEl, points) {
+            // Play scoring sound
+            SoundEngine.playScore(points);
+            
             // Animate the score display
             animateScoreHighlight(playerScoreEl, points);
             
@@ -3530,6 +3661,8 @@
                     const winner = gameState.player1.score >= 121 ? gameState.player1 : gameState.player2;
                     phaseInstruction.textContent = `${winner.name} wins ${winner.score} to ${winner === gameState.player1 ? gameState.player2.score : gameState.player1.score}!`;
                     document.getElementById('newGameButton').classList.remove('hidden');
+                    // Play win sound
+                    SoundEngine.playWin();
                     break;
             }
             

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🃏 Cribbage Pro - Debug Fixed</title>
+    <!-- PeerJS for P2P connections -->
+    <script src="https://unpkg.com/peerjs@1.5.0/dist/peerjs.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -638,6 +640,7 @@
         <!-- Navigation -->
         <div class="nav-tabs">
             <button class="nav-tab" onclick="showTab('play')">🎮 Play Game</button>
+            <button class="nav-tab" onclick="showTab('playFriend')">🤝 Play vs Friend</button>
             <button class="nav-tab active" onclick="showTab('handScorer')">🎯 Hand Scorer</button>
             <button class="nav-tab" onclick="showTab('discardAssistant')">🧠 Discard Assistant</button>
             <button class="nav-tab" onclick="showTab('scoreboard')">🏆 Scoreboard</button>
@@ -732,6 +735,133 @@
                             <button id="goButton" class="game-btn secondary hidden" onclick="sayGo()">Go</button>
                             <button id="nextHandButton" class="game-btn hidden" onclick="nextHand()">➡️ Next Hand</button>
                             <button id="newGameButton" class="game-btn secondary hidden" onclick="showGameSetup()">🔄 New Game</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Play vs Friend Tab (P2P Multiplayer) -->
+        <div id="playFriend" class="tab-content">
+            <div class="game-phase">
+                <h2 style="color: gold; text-align: center; margin-bottom: 15px;">🤝 Play vs Friend</h2>
+                <p style="color: #ccc; text-align: center; margin-bottom: 20px;">Play cribbage with a friend using peer-to-peer connection - no server needed!</p>
+                
+                <!-- Connection Setup -->
+                <div id="p2pSetup">
+                    <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin: 30px 0;">
+                        <!-- Host Game -->
+                        <div style="background: rgba(0,150,0,0.2); padding: 20px; border-radius: 12px; flex: 1; min-width: 250px; max-width: 300px;">
+                            <h3 style="color: #4ECDC4; text-align: center; margin-bottom: 15px;">🏠 Host Game</h3>
+                            <input type="text" id="hostName" placeholder="Your name" 
+                                   style="width: 100%; padding: 12px; margin-bottom: 15px; border: none; border-radius: 8px;">
+                            <button onclick="createP2PRoom()" class="game-btn" style="width: 100%;">
+                                🎯 Create Room
+                            </button>
+                        </div>
+                        
+                        <!-- Join Game -->
+                        <div style="background: rgba(0,100,150,0.2); padding: 20px; border-radius: 12px; flex: 1; min-width: 250px; max-width: 300px;">
+                            <h3 style="color: #FF6B6B; text-align: center; margin-bottom: 15px;">🚪 Join Game</h3>
+                            <input type="text" id="guestName" placeholder="Your name" 
+                                   style="width: 100%; padding: 12px; margin-bottom: 10px; border: none; border-radius: 8px;">
+                            <input type="text" id="roomCode" placeholder="4-digit room code" maxlength="4"
+                                   style="width: 100%; padding: 12px; margin-bottom: 15px; border: none; border-radius: 8px; text-align: center; font-size: 18px; font-weight: bold;">
+                            <button onclick="joinP2PRoom()" class="game-btn" style="width: 100%;">
+                                🤝 Join Room
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Status Display -->
+                    <div id="p2pStatus" class="game-message hidden" style="margin-top: 20px;"></div>
+                    
+                    <!-- How to Play P2P -->
+                    <div style="margin-top: 30px; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 12px;">
+                        <h3 style="color: #FFD700; margin-bottom: 15px;">🤝 How to Play vs Friend</h3>
+                        <div style="color: white; text-align: left; line-height: 1.8;">
+                            <p><strong>1. Host:</strong> Create a room and share the 4-digit code with your friend</p>
+                            <p><strong>2. Guest:</strong> Enter the code and join the room</p>
+                            <p><strong>3. Privacy:</strong> Pass device between players or play on separate devices</p>
+                            <p><strong>4. Same Game:</strong> All cribbage rules apply - deal, discard, peg, score!</p>
+                            <p><strong>5. Connection:</strong> Direct peer-to-peer, no server needed</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- P2P Game Interface -->
+                <div id="p2pGame" class="hidden">
+                    <!-- Connection Info -->
+                    <div id="p2pGameInfo" class="game-message" style="margin-bottom: 20px;">
+                        <strong>🤝 Connected Players:</strong>
+                        <span id="p2pPlayersList">Loading...</span>
+                    </div>
+                    
+                    <!-- Privacy Screen -->
+                    <div id="p2pPrivacyScreen" class="hidden" style="text-align: center; padding: 40px; background: rgba(0,0,0,0.8); border-radius: 12px; margin: 20px 0;">
+                        <h3 style="color: gold; margin-bottom: 20px;">👀 Pass to Other Player</h3>
+                        <p style="color: #ccc; margin-bottom: 20px; font-size: 18px;">
+                            It's <strong><span id="nextPlayerName">Player</span>'s</strong> turn
+                        </p>
+                        <button onclick="hidePrivacyScreen()" class="game-btn" style="font-size: 18px; padding: 15px 30px;">
+                            ✅ I'm Ready
+                        </button>
+                    </div>
+                    
+                    <!-- Game Area (reuses existing game components) -->
+                    <div id="p2pGameArea">
+                        <!-- Score Display -->
+                        <div class="score-display">
+                            <div id="p2pPlayer1Score" class="player-score">
+                                <div class="player-name">Player 1</div>
+                                <div class="player-points">0</div>
+                            </div>
+                            <div id="p2pPlayer2Score" class="player-score">
+                                <div class="player-name">Player 2</div>
+                                <div class="player-points">0</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Phase Display -->
+                        <div id="p2pCurrentPhase">
+                            <h3 style="color: gold; text-align: center; margin-bottom: 15px;" id="p2pPhaseTitle">Waiting to Start</h3>
+                            <p style="color: #ccc; text-align: center; margin-bottom: 20px; font-size: 1.1em;" id="p2pPhaseInstruction">Both players connected - ready to begin!</p>
+                            
+                            <!-- Game Message -->
+                            <div id="p2pGameMessage" class="game-message hidden">Game messages appear here</div>
+                            
+                            <!-- Cards and Game Controls -->
+                            <div id="p2pGameCards">
+                                <!-- Player hands will be dynamically created -->
+                                <div id="p2pPlayerHandArea" class="hidden">
+                                    <h4 style="color: #ccc; text-align: center; margin: 15px 0;">Your Hand:</h4>
+                                    <div id="p2pPlayerHand" class="hand-container"></div>
+                                </div>
+                                
+                                <!-- Starter Card -->
+                                <div id="p2pStarterArea" class="hidden">
+                                    <h4 style="color: gold; text-align: center; margin: 15px 0;">Starter Card:</h4>
+                                    <div id="p2pStarterCard" class="hand-container" style="justify-content: center;"></div>
+                                </div>
+                                
+                                <!-- Pegging Area -->
+                                <div id="p2pPeggingArea" class="pegging-area hidden">
+                                    <h4 style="color: #ccc; text-align: center; margin-bottom: 15px;">Pegging Phase</h4>
+                                    <div class="pegging-count" id="p2pPeggingCount">0</div>
+                                    <div class="pegging-cards" id="p2pPeggingCards"></div>
+                                    <p style="color: #ccc; text-align: center; margin-top: 10px;" id="p2pPeggingStatus">Click a card to play it</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Game Controls -->
+                            <div style="text-align: center; margin: 20px 0;">
+                                <button id="p2pStartGameButton" class="game-btn" onclick="startP2PGame()">🎯 Start Game</button>
+                                <button id="p2pConfirmDiscardButton" class="game-btn hidden" onclick="confirmP2PDiscard()">✅ Confirm Discard</button>
+                                <button id="p2pGoButton" class="game-btn secondary hidden" onclick="p2pSayGo()">Go</button>
+                                <button id="p2pNextHandButton" class="game-btn hidden" onclick="p2pNextHand()">➡️ Next Hand</button>
+                                <button id="p2pNewGameButton" class="game-btn secondary hidden" onclick="resetP2PGame()">🔄 New Game</button>
+                                <button onclick="disconnectP2P()" class="game-btn secondary">🚪 Disconnect</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1013,6 +1143,32 @@
         
         let selectedCards = [];
         
+        // P2P MULTIPLAYER STATE
+        let p2pState = {
+            peer: null,
+            connection: null,
+            isHost: false,
+            roomCode: null,
+            playerName: '',
+            opponentName: '',
+            gameState: {
+                player1: { name: '', score: 0, hand: [], originalHand: [] },
+                player2: { name: '', score: 0, hand: [], originalHand: [] },
+                dealer: 1,
+                phase: 'setup',
+                deck: [],
+                starter: null,
+                crib: [],
+                peggingCount: 0,
+                peggingCards: [],
+                currentPlayer: 1,
+                gameActive: false,
+                handNumber: 1
+            },
+            selectedCards: [],
+            myTurn: true
+        };
+        
         // Scoreboard state - Enhanced with better data persistence
         let scoreboardGameState = {
             player1: { 
@@ -1151,6 +1307,698 @@
                     }
                 }
             });
+        }
+        
+        // ===== P2P MULTIPLAYER FUNCTIONS =====
+        
+        function generateRoomCode() {
+            return Math.floor(1000 + Math.random() * 9000).toString();
+        }
+        
+        function createP2PRoom() {
+            const hostName = document.getElementById('hostName').value.trim();
+            if (!hostName) {
+                showMessage('Please enter your name first!');
+                return;
+            }
+            
+            p2pState.playerName = hostName;
+            p2pState.isHost = true;
+            p2pState.roomCode = generateRoomCode();
+            
+            // Initialize PeerJS
+            p2pState.peer = new Peer(p2pState.roomCode);
+            
+            p2pState.peer.on('open', (id) => {
+                updateP2PStatus(`🎯 Room created! Share code: <strong>${p2pState.roomCode}</strong><br>Waiting for friend to join...`, 'success');
+            });
+            
+            p2pState.peer.on('connection', (conn) => {
+                p2pState.connection = conn;
+                setupP2PConnection();
+                showMessage('Friend connected! 🎉', 'success');
+            });
+            
+            p2pState.peer.on('error', (error) => {
+                console.error('Peer error:', error);
+                updateP2PStatus('❌ Connection error. Please try again.', 'error');
+            });
+        }
+        
+        function joinP2PRoom() {
+            const guestName = document.getElementById('guestName').value.trim();
+            const roomCode = document.getElementById('roomCode').value.trim();
+            
+            if (!guestName || !roomCode) {
+                showMessage('Please enter your name and room code!');
+                return;
+            }
+            
+            if (roomCode.length !== 4) {
+                showMessage('Room code must be 4 digits!');
+                return;
+            }
+            
+            p2pState.playerName = guestName;
+            p2pState.isHost = false;
+            p2pState.roomCode = roomCode;
+            
+            // Initialize PeerJS
+            p2pState.peer = new Peer();
+            
+            p2pState.peer.on('open', () => {
+                updateP2PStatus('🔍 Connecting to room...', 'info');
+                p2pState.connection = p2pState.peer.connect(roomCode);
+                setupP2PConnection();
+            });
+            
+            p2pState.peer.on('error', (error) => {
+                console.error('Peer error:', error);
+                updateP2PStatus('❌ Could not connect to room. Check the code and try again.', 'error');
+            });
+        }
+        
+        function setupP2PConnection() {
+            p2pState.connection.on('open', () => {
+                // Send player name to establish connection
+                p2pState.connection.send({
+                    type: 'playerInfo',
+                    playerName: p2pState.playerName,
+                    isHost: p2pState.isHost
+                });
+                
+                showP2PGame();
+            });
+            
+            p2pState.connection.on('data', (data) => {
+                handleP2PMessage(data);
+            });
+            
+            p2pState.connection.on('close', () => {
+                updateP2PStatus('❌ Connection closed by other player.', 'error');
+                resetP2PConnection();
+            });
+            
+            p2pState.connection.on('error', (error) => {
+                console.error('Connection error:', error);
+                updateP2PStatus('❌ Connection error occurred.', 'error');
+            });
+        }
+        
+        function handleP2PMessage(data) {
+            switch(data.type) {
+                case 'playerInfo':
+                    p2pState.opponentName = data.playerName;
+                    updateP2PPlayersList();
+                    break;
+                    
+                case 'gameStateUpdate':
+                    p2pState.gameState = data.gameState;
+                    p2pState.myTurn = data.nextPlayerIsHost === p2pState.isHost;
+                    displayP2PGameState();
+                    break;
+                    
+                case 'gameAction':
+                    handleP2PGameAction(data);
+                    break;
+                    
+                case 'cardSelected':
+                    if (data.phase === 'discard') {
+                        showMessage(`${p2pState.opponentName} selected ${data.selectedCount}/2 cards`, 'success', 1000);
+                    }
+                    break;
+            }
+        }
+        
+        function sendP2PMessage(message) {
+            if (p2pState.connection && p2pState.connection.open) {
+                p2pState.connection.send(message);
+            }
+        }
+        
+        function updateP2PStatus(message, type = 'info') {
+            const statusEl = document.getElementById('p2pStatus');
+            statusEl.innerHTML = message;
+            statusEl.classList.remove('hidden');
+            statusEl.className = `game-message ${type}`;
+        }
+        
+        function updateP2PPlayersList() {
+            const playersEl = document.getElementById('p2pPlayersList');
+            if (playersEl) {
+                playersEl.textContent = `${p2pState.playerName} & ${p2pState.opponentName}`;
+            }
+        }
+        
+        function showP2PGame() {
+            document.getElementById('p2pSetup').classList.add('hidden');
+            document.getElementById('p2pGame').classList.remove('hidden');
+            
+            // Initialize game state
+            p2pState.gameState.player1.name = p2pState.isHost ? p2pState.playerName : p2pState.opponentName;
+            p2pState.gameState.player2.name = p2pState.isHost ? p2pState.opponentName : p2pState.playerName;
+            
+            updateP2PPlayersList();
+            updateP2PScoreDisplay();
+        }
+        
+        function startP2PGame() {
+            if (!p2pState.isHost) {
+                showMessage('Only the host can start the game!');
+                return;
+            }
+            
+            // Initialize new game
+            p2pState.gameState = {
+                player1: { name: p2pState.playerName, score: 0, hand: [], originalHand: [] },
+                player2: { name: p2pState.opponentName, score: 0, hand: [], originalHand: [] },
+                dealer: Math.random() < 0.5 ? 1 : 2,
+                phase: 'deal',
+                deck: createDeck(),
+                starter: null,
+                crib: [],
+                peggingCount: 0,
+                peggingCards: [],
+                currentPlayer: 1,
+                gameActive: true,
+                handNumber: 1
+            };
+            
+            // Deal cards
+            p2pDealCards();
+            
+            // Sync with opponent
+            syncP2PGameState();
+        }
+        
+        function p2pDealCards() {
+            const deck = p2pState.gameState.deck;
+            p2pState.gameState.player1.hand = deck.slice(0, 6);
+            p2pState.gameState.player2.hand = deck.slice(6, 12);
+            p2pState.gameState.starter = deck[12];
+            p2pState.gameState.phase = 'discard';
+            
+            displayP2PGameState();
+            showMessage(`Hand ${p2pState.gameState.handNumber} dealt! ${p2pState.gameState.dealer === 1 ? p2pState.gameState.player1.name : p2pState.gameState.player2.name} is the dealer.`, 'success', 3000);
+        }
+        
+        function displayP2PGameState() {
+            updateP2PPhaseDisplay();
+            displayP2PPlayerHand();
+            updateP2PScoreDisplay();
+        }
+        
+        function updateP2PPhaseDisplay() {
+            const phaseTitle = document.getElementById('p2pPhaseTitle');
+            const phaseInstruction = document.getElementById('p2pPhaseInstruction');
+            const gameMessage = document.getElementById('p2pGameMessage');
+            
+            switch(p2pState.gameState.phase) {
+                case 'discard':
+                    phaseTitle.textContent = '🃏 Discard Phase';
+                    phaseInstruction.textContent = p2pState.myTurn ? 'Select 2 cards to discard to the crib' : 'Waiting for opponent to discard...';
+                    gameMessage.classList.remove('hidden');
+                    const dealerName = p2pState.gameState.dealer === 1 ? p2pState.gameState.player1.name : p2pState.gameState.player2.name;
+                    gameMessage.textContent = `${dealerName} ${dealerName === 'You' || dealerName === p2pState.playerName ? 'are' : 'is'} the dealer`;
+                    
+                    if (p2pState.myTurn) {
+                        document.getElementById('p2pConfirmDiscardButton').classList.remove('hidden');
+                    }
+                    break;
+                    
+                case 'peg':
+                    phaseTitle.textContent = '🎯 Pegging Phase';
+                    phaseInstruction.textContent = p2pState.myTurn ? 'Your turn - play a card or say Go' : 'Waiting for opponent...';
+                    document.getElementById('p2pPeggingArea').classList.remove('hidden');
+                    if (p2pState.myTurn) {
+                        document.getElementById('p2pGoButton').classList.remove('hidden');
+                    }
+                    break;
+                    
+                case 'count':
+                    phaseTitle.textContent = '🔢 Counting Phase';
+                    phaseInstruction.textContent = 'Both hands scored along with the crib';
+                    document.getElementById('p2pNextHandButton').classList.remove('hidden');
+                    gameMessage.classList.remove('hidden');
+                    gameMessage.textContent = 'Both players\' hands are being scored';
+                    break;
+                    
+                case 'gameOver':
+                    phaseTitle.textContent = '🏆 Game Over!';
+                    const winner = p2pState.gameState.player1.score >= 121 ? p2pState.gameState.player1 : p2pState.gameState.player2;
+                    phaseInstruction.textContent = `${winner.name} wins ${winner.score} to ${winner === p2pState.gameState.player1 ? p2pState.gameState.player2.score : p2pState.gameState.player1.score}!`;
+                    document.getElementById('p2pNewGameButton').classList.remove('hidden');
+                    break;
+            }
+            
+            // Show starter if not in discard phase
+            if (p2pState.gameState.phase !== 'discard' && p2pState.gameState.starter) {
+                document.getElementById('p2pStarterArea').classList.remove('hidden');
+                displayP2PCard('p2pStarterCard', p2pState.gameState.starter, true);
+            }
+        }
+        
+        function displayP2PPlayerHand() {
+            if (p2pState.gameState.phase === 'setup') return;
+            
+            document.getElementById('p2pPlayerHandArea').classList.remove('hidden');
+            const handEl = document.getElementById('p2pPlayerHand');
+            handEl.innerHTML = '';
+            
+            // Show current player's hand
+            const myHand = p2pState.isHost ? p2pState.gameState.player1.hand : p2pState.gameState.player2.hand;
+            
+            myHand.forEach((card, index) => {
+                const cardEl = createCardElement(card, index, 'p2p');
+                if (p2pState.myTurn && (p2pState.gameState.phase === 'discard' || p2pState.gameState.phase === 'peg')) {
+                    cardEl.classList.add('selectable');
+                    cardEl.onclick = () => selectP2PCard(index);
+                }
+                handEl.appendChild(cardEl);
+            });
+        }
+        
+        function displayP2PCard(containerId, card, isStarter = false) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            const cardEl = createCardElement(card, -1, 'p2p');
+            if (isStarter) cardEl.classList.add('starter');
+            container.appendChild(cardEl);
+        }
+        
+        function selectP2PCard(cardIndex) {
+            if (!p2pState.myTurn) return;
+            
+            if (p2pState.gameState.phase === 'discard') {
+                selectP2PForDiscard(cardIndex);
+            } else if (p2pState.gameState.phase === 'peg') {
+                playP2PPeggingCard(cardIndex);
+            }
+        }
+        
+        function selectP2PForDiscard(cardIndex) {
+            const cardEl = document.querySelector(`[data-index="${cardIndex}"][data-player="p2p"]`);
+            
+            if (p2pState.selectedCards.includes(cardIndex)) {
+                // Deselect
+                p2pState.selectedCards = p2pState.selectedCards.filter(i => i !== cardIndex);
+                cardEl.classList.remove('selected');
+            } else if (p2pState.selectedCards.length < 2) {
+                // Select
+                p2pState.selectedCards.push(cardIndex);
+                cardEl.classList.add('selected');
+            } else {
+                showMessage('You can only select 2 cards to discard!');
+            }
+            
+            // Notify opponent of selection progress
+            sendP2PMessage({
+                type: 'cardSelected',
+                phase: 'discard',
+                selectedCount: p2pState.selectedCards.length
+            });
+        }
+        
+        function confirmP2PDiscard() {
+            if (p2pState.selectedCards.length !== 2) {
+                showMessage('Please select exactly 2 cards to discard!');
+                return;
+            }
+            
+            // Send discard action to opponent
+            sendP2PMessage({
+                type: 'gameAction',
+                action: 'discard',
+                selectedCards: p2pState.selectedCards
+            });
+            
+            // Process locally and sync
+            processP2PDiscard(p2pState.selectedCards, p2pState.isHost);
+        }
+        
+        function processP2PDiscard(selectedCards, isHost) {
+            const playerHand = isHost ? p2pState.gameState.player1.hand : p2pState.gameState.player2.hand;
+            
+            // Move selected cards to crib
+            if (!p2pState.gameState.crib) p2pState.gameState.crib = [];
+            
+            selectedCards.sort((a, b) => b - a); // Sort descending
+            selectedCards.forEach(index => {
+                p2pState.gameState.crib.push(playerHand[index]);
+                playerHand.splice(index, 1);
+            });
+            
+            // Store original hands
+            if (isHost) {
+                p2pState.gameState.player1.originalHand = [...p2pState.gameState.player1.hand];
+            } else {
+                p2pState.gameState.player2.originalHand = [...p2pState.gameState.player2.hand];
+            }
+            
+            // Check if both players have discarded
+            if (p2pState.gameState.crib.length >= 4) {
+                // Start pegging phase
+                p2pState.gameState.phase = 'peg';
+                p2pState.gameState.currentPlayer = p2pState.gameState.dealer === 1 ? 2 : 1; // Non-dealer goes first
+                updateP2PTurn();
+                showMessage('Both players discarded! Starting pegging phase...', 'success', 2000);
+            } else {
+                // Wait for other player
+                p2pState.myTurn = false;
+                showMessage('Discard sent! Waiting for opponent...', 'success', 2000);
+            }
+            
+            p2pState.selectedCards = [];
+            document.getElementById('p2pConfirmDiscardButton').classList.add('hidden');
+            syncP2PGameState();
+        }
+        
+        function handleP2PGameAction(data) {
+            switch(data.action) {
+                case 'discard':
+                    processP2PDiscard(data.selectedCards, !p2pState.isHost);
+                    break;
+                    
+                case 'playCard':
+                    processP2PPlayCard(data.cardIndex, !p2pState.isHost);
+                    break;
+                    
+                case 'go':
+                    processP2PSayGo(!p2pState.isHost);
+                    break;
+            }
+        }
+        
+        function playP2PPeggingCard(cardIndex) {
+            const myHand = p2pState.isHost ? p2pState.gameState.player1.hand : p2pState.gameState.player2.hand;
+            const card = myHand[cardIndex];
+            const cardValue = getCardValue(card);
+            
+            if (p2pState.gameState.peggingCount + cardValue > 31) {
+                showMessage('That card would exceed 31!');
+                return;
+            }
+            
+            // Send play action to opponent
+            sendP2PMessage({
+                type: 'gameAction',
+                action: 'playCard',
+                cardIndex: cardIndex
+            });
+            
+            processP2PPlayCard(cardIndex, p2pState.isHost);
+        }
+        
+        function processP2PPlayCard(cardIndex, isHost) {
+            const playerHand = isHost ? p2pState.gameState.player1.hand : p2pState.gameState.player2.hand;
+            const card = playerHand[cardIndex];
+            const cardValue = getCardValue(card);
+            
+            // Play the card
+            p2pState.gameState.peggingCount += cardValue;
+            p2pState.gameState.peggingCards.push({ card, player: isHost ? 1 : 2 });
+            
+            // Remove from hand
+            playerHand.splice(cardIndex, 1);
+            
+            // Check for pegging points
+            const points = calculatePeggingPoints();
+            if (points > 0) {
+                if (isHost) {
+                    p2pState.gameState.player1.score += points;
+                } else {
+                    p2pState.gameState.player2.score += points;
+                }
+                showMessage(`${isHost ? p2pState.gameState.player1.name : p2pState.gameState.player2.name} scores ${points} points!`, 'success', 2000);
+            }
+            
+            // Check for game end
+            if (p2pState.gameState.player1.score >= 121 || p2pState.gameState.player2.score >= 121) {
+                p2pState.gameState.phase = 'gameOver';
+                syncP2PGameState();
+                return;
+            }
+            
+            // Continue pegging or end phase
+            if (p2pState.gameState.peggingCount === 31 || 
+                (p2pState.gameState.player1.hand.length === 0 && p2pState.gameState.player2.hand.length === 0)) {
+                p2pState.gameState.phase = 'count';
+                p2pCountP2PHands();
+            } else {
+                switchP2PTurn();
+            }
+            
+            syncP2PGameState();
+        }
+        
+        function p2pSayGo() {
+            sendP2PMessage({
+                type: 'gameAction',
+                action: 'go'
+            });
+            
+            processP2PSayGo(p2pState.isHost);
+        }
+        
+        function processP2PSayGo(isHost) {
+            const playerName = isHost ? p2pState.gameState.player1.name : p2pState.gameState.player2.name;
+            showMessage(`${playerName} says "Go"`, 'success', 1500);
+            
+            // Award point for Go unless exactly 31
+            if (p2pState.gameState.peggingCount < 31) {
+                const otherPlayer = isHost ? p2pState.gameState.player2 : p2pState.gameState.player1;
+                otherPlayer.score++;
+                showMessage(`${otherPlayer.name} gets 1 point for Go!`, 'success', 2000);
+            }
+            
+            // Reset or continue
+            p2pState.gameState.peggingCount = 0;
+            
+            if (p2pState.gameState.player1.hand.length === 0 && p2pState.gameState.player2.hand.length === 0) {
+                p2pState.gameState.phase = 'count';
+                p2pCountP2PHands();
+            } else {
+                switchP2PTurn();
+            }
+            
+            syncP2PGameState();
+        }
+        
+        function p2pCountP2PHands() {
+            // Restore hands for scoring
+            p2pState.gameState.player1.hand = [...p2pState.gameState.player1.originalHand];
+            p2pState.gameState.player2.hand = [...p2pState.gameState.player2.originalHand];
+            
+            // Score hands
+            const player1Points = scoreHandComplete(p2pState.gameState.player1.originalHand, p2pState.gameState.starter);
+            const player2Points = scoreHandComplete(p2pState.gameState.player2.originalHand, p2pState.gameState.starter);
+            const cribPoints = scoreHandComplete(p2pState.gameState.crib, p2pState.gameState.starter);
+            
+            p2pState.gameState.player1.score += player1Points;
+            p2pState.gameState.player2.score += player2Points;
+            
+            const dealerName = p2pState.gameState.dealer === 1 ? p2pState.gameState.player1.name : p2pState.gameState.player2.name;
+            if (p2pState.gameState.dealer === 1) {
+                p2pState.gameState.player1.score += cribPoints;
+            } else {
+                p2pState.gameState.player2.score += cribPoints;
+            }
+            
+            // Display detailed scoring
+            displayP2PHandScores(player1Points, player2Points, cribPoints, dealerName);
+            
+            // Check for win
+            if (p2pState.gameState.player1.score >= 121 || p2pState.gameState.player2.score >= 121) {
+                p2pState.gameState.phase = 'gameOver';
+            }
+            
+            syncP2PGameState();
+        }
+        
+        function displayP2PHandScores(player1Points, player2Points, cribPoints, dealerName) {
+            const gameMessage = document.getElementById('p2pGameMessage');
+            gameMessage.classList.remove('hidden');
+            gameMessage.innerHTML = `
+                <div style="text-align: left; line-height: 1.6;">
+                    <h4 style="color: gold; margin-bottom: 10px;">📊 Hand Scoring Results:</h4>
+                    
+                    <div style="margin-bottom: 15px; padding: 10px; background: rgba(0,150,0,0.2); border-radius: 8px;">
+                        <strong>${p2pState.gameState.player1.name}: ${player1Points} points</strong>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px; padding: 10px; background: rgba(0,100,150,0.2); border-radius: 8px;">
+                        <strong>${p2pState.gameState.player2.name}: ${player2Points} points</strong>
+                    </div>
+                    
+                    <div style="margin-bottom: 10px; padding: 10px; background: rgba(255,215,0,0.2); border-radius: 8px;">
+                        <strong>Crib (${dealerName}): ${cribPoints} points</strong>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function switchP2PTurn() {
+            p2pState.gameState.currentPlayer = p2pState.gameState.currentPlayer === 1 ? 2 : 1;
+            updateP2PTurn();
+        }
+        
+        function updateP2PTurn() {
+            // Determine if it's my turn based on current player and host status
+            p2pState.myTurn = (p2pState.gameState.currentPlayer === 1 && p2pState.isHost) || 
+                             (p2pState.gameState.currentPlayer === 2 && !p2pState.isHost);
+            
+            if (!p2pState.myTurn) {
+                showP2PPrivacyScreen();
+            }
+        }
+        
+        function showP2PPrivacyScreen() {
+            const nextPlayerName = p2pState.myTurn ? 'You' : p2pState.opponentName;
+            document.getElementById('nextPlayerName').textContent = nextPlayerName;
+            document.getElementById('p2pPrivacyScreen').classList.remove('hidden');
+        }
+        
+        function hidePrivacyScreen() {
+            document.getElementById('p2pPrivacyScreen').classList.add('hidden');
+            displayP2PGameState();
+        }
+        
+        function syncP2PGameState() {
+            sendP2PMessage({
+                type: 'gameStateUpdate',
+                gameState: p2pState.gameState,
+                nextPlayerIsHost: (p2pState.gameState.currentPlayer === 1)
+            });
+            
+            displayP2PGameState();
+        }
+        
+        function updateP2PScoreDisplay() {
+            const player1ScoreEl = document.getElementById('p2pPlayer1Score');
+            const player2ScoreEl = document.getElementById('p2pPlayer2Score');
+            
+            if (player1ScoreEl && player2ScoreEl) {
+                player1ScoreEl.innerHTML = `
+                    <div class="player-name">${p2pState.gameState.player1.name}</div>
+                    <div class="player-points">${p2pState.gameState.player1.score}</div>
+                `;
+                
+                player2ScoreEl.innerHTML = `
+                    <div class="player-name">${p2pState.gameState.player2.name}</div>
+                    <div class="player-points">${p2pState.gameState.player2.score}</div>
+                `;
+                
+                // Highlight dealer
+                player1ScoreEl.classList.toggle('current-dealer', p2pState.gameState.dealer === 1);
+                player2ScoreEl.classList.toggle('current-dealer', p2pState.gameState.dealer === 2);
+            }
+        }
+        
+        function p2pNextHand() {
+            if (!p2pState.isHost) {
+                showMessage('Only the host can advance to the next hand!');
+                return;
+            }
+            
+            p2pState.gameState.handNumber++;
+            p2pState.gameState.dealer = p2pState.gameState.dealer === 1 ? 2 : 1;
+            p2pState.gameState.phase = 'deal';
+            p2pState.gameState.peggingCount = 0;
+            p2pState.gameState.peggingCards = [];
+            p2pState.gameState.crib = [];
+            p2pState.gameState.currentPlayer = 1;
+            
+            // Clear hands
+            p2pState.gameState.player1.hand = [];
+            p2pState.gameState.player1.originalHand = [];
+            p2pState.gameState.player2.hand = [];
+            p2pState.gameState.player2.originalHand = [];
+            
+            // Hide UI elements
+            document.getElementById('p2pNextHandButton').classList.add('hidden');
+            document.getElementById('p2pStarterArea').classList.add('hidden');
+            document.getElementById('p2pPeggingArea').classList.add('hidden');
+            document.getElementById('p2pGameMessage').classList.add('hidden');
+            
+            // Deal new hand
+            p2pState.gameState.deck = createDeck();
+            p2pDealCards();
+            syncP2PGameState();
+        }
+        
+        function resetP2PGame() {
+            document.getElementById('p2pStartGameButton').classList.remove('hidden');
+            document.getElementById('p2pNewGameButton').classList.add('hidden');
+            p2pState.myTurn = p2pState.isHost; // Host always starts new game
+            
+            // Reset game state
+            p2pState.gameState = {
+                player1: { name: p2pState.gameState.player1.name, score: 0, hand: [], originalHand: [] },
+                player2: { name: p2pState.gameState.player2.name, score: 0, hand: [], originalHand: [] },
+                dealer: 1,
+                phase: 'setup',
+                deck: [],
+                starter: null,
+                crib: [],
+                peggingCount: 0,
+                peggingCards: [],
+                currentPlayer: 1,
+                gameActive: false,
+                handNumber: 1
+            };
+            
+            updateP2PScoreDisplay();
+            document.getElementById('p2pPhaseTitle').textContent = 'Ready for New Game';
+            document.getElementById('p2pPhaseInstruction').textContent = p2pState.isHost ? 'Click Start Game to begin' : 'Waiting for host to start';
+        }
+        
+        function disconnectP2P() {
+            if (confirm('Are you sure you want to disconnect?')) {
+                if (p2pState.connection) {
+                    p2pState.connection.close();
+                }
+                if (p2pState.peer) {
+                    p2pState.peer.destroy();
+                }
+                resetP2PConnection();
+            }
+        }
+        
+        function resetP2PConnection() {
+            p2pState = {
+                peer: null,
+                connection: null,
+                isHost: false,
+                roomCode: null,
+                playerName: '',
+                opponentName: '',
+                gameState: {
+                    player1: { name: '', score: 0, hand: [], originalHand: [] },
+                    player2: { name: '', score: 0, hand: [], originalHand: [] },
+                    dealer: 1,
+                    phase: 'setup',
+                    deck: [],
+                    starter: null,
+                    crib: [],
+                    peggingCount: 0,
+                    peggingCards: [],
+                    currentPlayer: 1,
+                    gameActive: false,
+                    handNumber: 1
+                },
+                selectedCards: [],
+                myTurn: true
+            };
+            
+            // Show setup screen
+            document.getElementById('p2pSetup').classList.remove('hidden');
+            document.getElementById('p2pGame').classList.add('hidden');
+            document.getElementById('p2pStatus').classList.add('hidden');
+            
+            // Clear input fields
+            document.getElementById('hostName').value = '';
+            document.getElementById('guestName').value = '';
+            document.getElementById('roomCode').value = '';
         }
         
         // ===== ENHANCED HAND SCORER FUNCTIONS =====

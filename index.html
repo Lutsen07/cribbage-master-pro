@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>🃏 Cribbage Pro - Debug Fixed</title>
     <!-- PeerJS for P2P connections -->
     <script src="https://unpkg.com/peerjs@1.5.0/dist/peerjs.min.js"></script>
@@ -14,6 +14,53 @@
             background: linear-gradient(135deg, #1a5f1a 0%, #2d8a2d 50%, #1a5f1a 100%);
             min-height: 100vh;
             overflow-x: hidden;
+            /* Mobile viewport optimization */
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Mobile-first responsive design */
+        @media (max-width: 768px) {
+            body {
+                /* Prevent zoom on input focus */
+                -webkit-text-size-adjust: 100%;
+                /* Optimize for mobile browsers */
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                user-select: none;
+            }
+        }
+        
+        /* Ultra-compact mobile layout */
+        @media (max-height: 640px) {
+            .app-container {
+                padding: 5px;
+            }
+            
+            .app-header {
+                padding: 10px;
+                margin-bottom: 10px;
+            }
+            
+            .app-title {
+                font-size: clamp(1.5em, 6vw, 2.2em);
+                margin-bottom: 5px;
+            }
+            
+            .app-subtitle {
+                font-size: clamp(0.8em, 3vw, 1em);
+                margin-bottom: 5px;
+            }
+            
+            .nav-tabs {
+                gap: 4px;
+                margin-bottom: 10px;
+            }
+            
+            .nav-tab {
+                padding: 10px 12px;
+                font-size: 0.8em;
+                min-width: 80px;
+            }
         }
         
         .felt-texture {
@@ -146,6 +193,56 @@
                 /* Ensure minimum touch target */
                 min-width: 48px;
                 min-height: 64px;
+                /* Enhanced touch feedback */
+                padding: 6px 3px;
+            }
+        }
+        
+        /* Ultra-compact cards for small screens */
+        @media (max-width: 480px) {
+            .card {
+                width: 48px;
+                height: 70px;
+                margin: 2px;
+                font-size: 0.8em;
+                padding: 4px 2px;
+            }
+            
+            .card-rank {
+                font-size: 14px;
+            }
+            
+            .card-suit {
+                font-size: 16px;
+            }
+        }
+        
+        /* Very small screens - landscape phones */
+        @media (max-height: 640px) and (orientation: landscape) {
+            .card {
+                width: 42px;
+                height: 60px;
+                margin: 1px;
+                padding: 3px 2px;
+            }
+            
+            .card-rank {
+                font-size: 12px;
+            }
+            
+            .card-suit {
+                font-size: 14px;
+            }
+            
+            .hand-container {
+                gap: 3px;
+                margin: 10px 0;
+                padding: 8px;
+            }
+            
+            .game-phase {
+                padding: 10px;
+                margin-bottom: 10px;
             }
         }
         
@@ -666,6 +763,28 @@
             margin: 5px;
         }
         
+        /* Mobile-optimized buttons */
+        @media (max-width: 768px) {
+            .game-btn {
+                padding: 14px 20px;
+                min-height: 48px;
+                font-size: 14px;
+                margin: 3px;
+                /* Better touch targets */
+                min-width: 120px;
+            }
+        }
+        
+        @media (max-height: 640px) {
+            .game-btn {
+                padding: 10px 16px;
+                min-height: 44px;
+                font-size: 13px;
+                margin: 2px;
+                min-width: 100px;
+            }
+        }
+        
         .game-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(0,0,0,0.3);
@@ -680,6 +799,43 @@
             justify-content: space-around;
             margin: 20px 0;
             gap: 20px;
+        }
+        
+        /* Mobile score display optimization */
+        @media (max-width: 768px) {
+            .score-display {
+                margin: 15px 0;
+                gap: 10px;
+            }
+            
+            .player-score {
+                padding: 10px;
+                font-size: 0.9em;
+            }
+            
+            .player-points {
+                font-size: 1.8em;
+            }
+        }
+        
+        @media (max-height: 640px) {
+            .score-display {
+                margin: 8px 0;
+                gap: 8px;
+            }
+            
+            .player-score {
+                padding: 8px;
+                font-size: 0.8em;
+            }
+            
+            .player-points {
+                font-size: 1.5em;
+            }
+            
+            .player-name {
+                font-size: 0.9em;
+            }
         }
         
         .player-score {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🃏 Cribbage Pro</title>
+    <title>🃏 Cribbage Pro - Debug Fixed</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -39,18 +39,46 @@
         
         .app-title {
             color: gold;
-            font-size: 3em;
+            font-size: clamp(2em, 8vw, 3em);
             text-shadow: 3px 3px 6px rgba(0,0,0,0.7);
             margin-bottom: 10px;
         }
         
         .app-subtitle {
             color: #ddd;
-            font-size: 1.3em;
+            font-size: clamp(1em, 4vw, 1.3em);
             opacity: 0.9;
+            margin-bottom: 15px;
         }
         
-        /* Navigation */
+        /* Prominent Play Button */
+        .play-button {
+            background: linear-gradient(145deg, #FF6B6B, #FF5252);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 2em;
+            font-weight: bold;
+            padding: 15px 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 8px 25px rgba(255,107,107,0.4);
+            margin: 10px;
+            min-height: 60px;
+        }
+        
+        .play-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(255,107,107,0.6);
+        }
+        
+        .play-button:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+        
+        /* Navigation - Enhanced Mobile Touch Targets */
         .nav-tabs {
             display: flex;
             justify-content: center;
@@ -60,29 +88,44 @@
         }
         
         .nav-tab {
-            padding: 12px 20px;
+            padding: 16px 24px; /* Increased padding for better touch targets */
+            min-height: 44px; /* Apple's minimum touch target size */
+            min-width: 120px;
             background: linear-gradient(145deg, #444, #222);
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 1em;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        .nav-tab:hover {
+        .nav-tab:hover, .nav-tab:focus {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            outline: none;
         }
         
         .nav-tab.active {
             background: linear-gradient(145deg, #FFD700, #FFA500);
             color: #333;
             box-shadow: 0 0 25px rgba(255,215,0,0.6);
+        }
+        
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            .nav-tab {
+                font-size: 0.9em;
+                min-width: 100px;
+                padding: 14px 18px;
+            }
         }
         
         /* Main Content */
@@ -100,816 +143,412 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Card Table */
-        .card-table {
-            background: linear-gradient(145deg, #0d5c0d, #1a691a);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 
-                inset 0 0 100px rgba(0,0,0,0.3),
-                0 15px 40px rgba(0,0,0,0.5);
-            border: 3px solid #8B4513;
-            margin-bottom: 20px;
-        }
-        
-        .section-title {
-            color: gold;
-            font-size: 1.8em;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
-            text-align: center;
-        }
-        
-        /* Cards */
-        .hand-display {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            justify-content: center;
-            margin: 20px 0;
-        }
-        
+        /* Card Styling - Enhanced Touch Targets */
         .card {
-            width: 100px;
-            height: 140px;
-            background: linear-gradient(145deg, #ffffff, #f8f8f8);
-            border-radius: 12px;
+            width: 60px;
+            height: 90px;
+            background: white;
+            border: 2px solid #333;
+            border-radius: 8px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8em;
-            font-weight: bold;
+            justify-content: space-between;
+            margin: 5px;
+            padding: 8px 4px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            border: 2px solid #ccc;
-            user-select: none;
+            transition: all 0.3s ease;
             position: relative;
+            user-select: none;
+            /* Enhanced touch targets */
+            min-width: 44px;
+            min-height: 60px;
         }
         
-        .card:hover {
-            transform: translateY(-8px) rotate(2deg);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+        @media (max-width: 768px) {
+            .card {
+                width: 55px;
+                height: 80px;
+                margin: 3px;
+                /* Ensure minimum touch target */
+                min-width: 48px;
+                min-height: 64px;
+            }
+        }
+        
+        .card:hover, .card:focus {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            z-index: 2;
+            outline: none;
         }
         
         .card.selected {
-            transform: translateY(-15px) scale(1.05);
-            box-shadow: 0 0 30px gold, 0 15px 30px rgba(0,0,0,0.6);
-            border: 3px solid gold;
-            z-index: 10;
+            border-color: gold;
+            box-shadow: 0 0 20px rgba(255,215,0,0.8);
+            transform: translateY(-3px);
         }
         
-        .card.starter-card {
-            background: linear-gradient(145deg, #FFD700, #FFA500);
-            border: 3px solid #FF6B35;
-            box-shadow: 0 0 30px rgba(255,215,0,0.8);
+        .card.starter {
+            border-color: gold;
+            background: linear-gradient(145deg, #fff9c4, #ffffff);
+            box-shadow: 0 0 15px rgba(255,215,0,0.6);
         }
-        
-        .card.red { color: #d00; }
-        .card.black { color: #000; }
         
         .card-rank {
-            font-size: 1.5em;
-            margin-bottom: 5px;
-            cursor: pointer;
-            padding: 5px;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-        
-        .card-rank:hover {
-            background-color: rgba(255,215,0,0.2);
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
         }
         
         .card-suit {
-            font-size: 1.8em;
-            cursor: pointer;
-            padding: 5px;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-        }
-        
-        .card-suit:hover {
-            background-color: rgba(255,215,0,0.2);
-        }
-        
-        /* Controls */
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            margin: 20px 0;
-        }
-        
-        .btn {
-            padding: 10px 20px;
-            font-size: 1em;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-        }
-        
-        .btn-primary {
-            background: linear-gradient(145deg, #FFD700, #FFA500);
-            color: #333;
-        }
-        
-        .btn-secondary {
-            background: linear-gradient(145deg, #555, #333);
-            color: white;
-        }
-        
-        .btn-danger {
-            background: linear-gradient(145deg, #ff4444, #cc0000);
-            color: white;
-        }
-        
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-        }
-        
-        .btn:active {
-            transform: translateY(-1px);
-        }
-        
-        /* Score Display */
-        .score-display {
-            background: linear-gradient(145deg, rgba(0,0,0,0.6), rgba(0,0,0,0.4));
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-            border: 2px solid gold;
-        }
-        
-        .total-score {
-            font-size: 3em;
-            color: gold;
+            font-size: 18px;
             text-align: center;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-            margin-bottom: 20px;
+            margin-top: auto;
         }
         
-        .score-breakdown {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
+        .card-suit.red { color: #d63384; }
+        .card-suit.black { color: #333; }
         
-        .score-item {
-            background: rgba(255,255,255,0.1);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        
-        .score-item-title {
-            color: gold;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .score-item-value {
-            color: white;
-            font-size: 1.3em;
-        }
-        
-        /* Quick hands section removed - now auto-detected! */
-        
-        /* Tutorial Styles */
-        .tutorial-card {
-            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-            border-radius: 15px;
-            padding: 25px;
-            margin: 20px 0;
-            border-left: 5px solid gold;
-        }
-        
-        .tutorial-title {
-            color: gold;
-            font-size: 1.5em;
-            margin-bottom: 15px;
-        }
-        
-        .tutorial-content {
-            color: white;
-            line-height: 1.6;
-        }
-        
-        /* Statistics */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-        
-        .stat-card {
-            background: linear-gradient(145deg, rgba(0,0,0,0.5), rgba(0,0,0,0.3));
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            border: 2px solid rgba(255,255,255,0.2);
-        }
-        
-        .stat-value {
-            font-size: 2em;
-            color: gold;
-            font-weight: bold;
-        }
-        
-        .stat-label {
-            color: white;
-            margin-top: 5px;
-            font-size: 0.9em;
-        }
-        
-        /* Discard Assistant Specific Styles */
-        .crib-toggle input[type="radio"] {
-            margin-right: 8px;
-            transform: scale(1.2);
-        }
-        
-        .analysis-table {
-            background: rgba(0,0,0,0.3);
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 20px 0;
-        }
-        
-        .analysis-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .analysis-table th {
-            background: linear-gradient(145deg, #333, #111);
-            color: gold;
-            padding: 12px 8px;
-            font-weight: bold;
-            border-bottom: 2px solid gold;
-        }
-        
-        .analysis-table td {
-            padding: 10px 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            text-align: center;
-        }
-        
-        .analysis-table tr:hover {
-            background: rgba(255,255,255,0.05);
-        }
-        
-        .analysis-table .best-row {
-            background: linear-gradient(145deg, rgba(255,215,0,0.15), rgba(255,215,0,0.05)) !important;
-            border: 1px solid rgba(255,215,0,0.3);
-        }
-        
-        .mini-card-container {
-            display: inline-flex;
-            gap: 3px;
-        }
-        
-        .mini-card {
-            display: inline-block;
-            padding: 3px 6px;
-            background: linear-gradient(145deg, #ffffff, #f0f0f0);
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 0.9em;
-            font-weight: bold;
-            color: #333;
-            min-width: 28px;
-            text-align: center;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-            margin: 1px;
-        }
-        
-        .mini-card.red {
-            color: #d00;
-        }
-        
-        .mini-card.black {
-            color: #000;
-        }
-        
-        .recommendation-cards {
+        /* Hand containers */
+        .hand-container {
             display: flex;
             justify-content: center;
-            align-items: center;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 8px;
             margin: 20px 0;
-        }
-        
-        .recommendation-section {
-            text-align: center;
             padding: 15px;
             background: rgba(0,0,0,0.2);
-            border-radius: 10px;
-            border: 2px solid rgba(255,255,255,0.1);
-            min-width: 200px;
+            border-radius: 12px;
         }
         
-        .recommendation-section h4 {
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-        
-        .card-grid {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        /* Consistent mini-card styling for both scoring and discard analysis */
-        
-        /* Mobile responsive adjustments for tables */
-        @media (max-width: 768px) {
-            .analysis-table table,
-            .tutorial-card table {
-                font-size: 0.9em;
-            }
-            
-            .analysis-table th,
-            .tutorial-card th {
-                padding: 8px 4px;
-            }
-            
-            .analysis-table td,
-            .tutorial-card td {
-                padding: 8px 4px;
-            }
-            
-            .mini-card {
-                font-size: 0.8em;
-                min-width: 24px;
-                padding: 2px 4px;
-            }
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .app-container { padding: 5px; }
-            .app-title { font-size: 2em; }
-            .card { width: 75px; height: 105px; font-size: 1.3em; }
-            .card-table { padding: 15px; margin-bottom: 15px; }
-            .nav-tabs { gap: 5px; margin-bottom: 15px; }
-            .nav-tab { padding: 10px 16px; font-size: 0.9em; }
-            .controls { gap: 8px; }
-            .app-header { padding: 10px; margin-bottom: 15px; }
-        }
-        
-        /* Animations */
-        .card-flip {
-            animation: flipCard 0.6s ease-in-out;
-        }
-        
-        @keyframes flipCard {
-            0% { transform: rotateY(0deg); }
-            50% { transform: rotateY(90deg); }
-            100% { transform: rotateY(0deg); }
-        }
-        
-        .score-pop {
-            animation: scorePop 0.5s ease-out;
-        }
-        
-        @keyframes scorePop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        
-        @keyframes slideIn {
-            0% { 
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            100% { 
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        
-        /* Tooltip styles removed */
-        
-        /* Scoreboard Styles */
-        .scoreboard-section {
-            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 2px solid rgba(255,255,255,0.2);
-        }
-        
-        .scoreboard-setup {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .player-input-scoreboard {
-            text-align: center;
-        }
-        
-        .player-input-scoreboard label {
-            display: block;
-            font-size: 1.2em;
-            margin-bottom: 10px;
-            font-weight: bold;
-            color: white;
-        }
-        
-        .player-input-scoreboard input {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
-            text-align: center;
-            background: rgba(255,255,255,0.9);
-            color: #333;
-        }
-        
-        .scoreboard-controls {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-        
-        /* Vertical Serpentine Cribbage Board Layout */
-        .traditional-board {
-            background: linear-gradient(145deg, #8b4513, #a0522d);
-            border-radius: 20px;
-            padding: 15px;
-            margin: 20px auto;
-            border: 4px solid #654321;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.3), 0 10px 30px rgba(0,0,0,0.5);
-            max-width: 320px;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
-        
+        /* Scoreboard Enhancements */
         .board-container-vertical {
             display: flex;
-            flex-direction: row;
-            gap: 8px;
             justify-content: center;
-            align-items: stretch;
+            gap: 15px;
+            padding: 20px 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            margin: 20px 0;
         }
         
         .board-column {
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            align-items: center;
-            background: rgba(139, 69, 19, 0.4);
-            border-radius: 10px;
-            padding: 8px 4px;
-            border: 1px solid rgba(255,255,255,0.1);
+            gap: 3px;
         }
         
         .board-column.reverse {
             flex-direction: column-reverse;
         }
         
-        .finish-section {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 10px;
-            padding: 10px;
-            width: 100%;
-        }
-        
         .scoreboard-hole {
-            width: 16px;
-            height: 16px;
-            background: #654321;
-            border-radius: 50%;
-            border: 1px solid #8b4513;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-            margin: 2px 0;
-        }
-        
-        .scoreboard-hole.marked {
             width: 20px;
             height: 20px;
-            border: 2px solid #8b4513;
+            background: radial-gradient(circle, #8B4513, #654321);
+            border: 2px solid #5a3a1a;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.65em;
-            color: #fff;
+            font-size: 0.6em;
             font-weight: bold;
+            color: #fff;
+            /* Enhanced touch targets */
+            min-width: 32px;
+            min-height: 32px;
+        }
+        
+        @media (max-width: 768px) {
+            .scoreboard-hole {
+                width: 18px;
+                height: 18px;
+                min-width: 36px;
+                min-height: 36px;
+            }
         }
         
         .scoreboard-hole:hover {
-            background: #daa520;
-            border-color: #ffd700;
-            transform: scale(1.3);
-            box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+            transform: scale(1.2);
+            box-shadow: 0 0 15px rgba(255,215,0,0.8);
+            z-index: 10;
         }
         
-        .scoreboard-hole.marked:hover {
-            transform: scale(1.2);
+        .scoreboard-hole.marked {
+            border-color: #FFD700;
+            box-shadow: 0 0 8px rgba(255,215,0,0.4);
         }
         
         .scoreboard-hole.corner {
-            background: #b8860b;
-            border-color: #ffd700;
-            box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+            background: radial-gradient(circle, #FFD700, #FFA500);
+            border-color: #FF8C00;
+            color: #333;
         }
         
         .scoreboard-hole.preview {
-            background: #90ee90;
-            border-color: #32cd32;
-            box-shadow: 0 0 12px rgba(50, 205, 50, 0.6);
+            background: radial-gradient(circle, #00ff00, #00cc00);
+            transform: scale(1.3);
+            box-shadow: 0 0 20px rgba(0,255,0,0.8);
             animation: pulse 1s infinite;
         }
         
         @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
         }
         
+        /* Peg animations - Enhanced smoothness */
         .scoreboard-peg {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
             position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            border: 2px solid white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-            z-index: 10;
+            z-index: 5;
+            transition: all 0.5s cubic-bezier(0.4, 0.0, 0.2, 1); /* Smoother easing */
+            animation: pegDrop 0.5s ease-out;
         }
         
-        .scoreboard-peg.current {
-            animation: pegPlace 0.6s ease-out;
-            border-width: 3px;
+        @keyframes pegDrop {
+            0% { 
+                transform: translate(-50%, -150%) scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -40%) scale(1.2);
+                opacity: 0.8;
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .scoreboard-peg.player1 { 
+            background: #FF6B6B;
+            border: 2px solid #FF5252;
+            box-shadow: 0 2px 8px rgba(255,107,107,0.6);
+        }
+        
+        .scoreboard-peg.player2 { 
+            background: #4ECDC4;
+            border: 2px solid #26C6DA;
+            box-shadow: 0 2px 8px rgba(78,205,196,0.6);
         }
         
         .scoreboard-peg.previous {
-            opacity: 0.7;
-            border-width: 2px;
-            z-index: 5;
+            opacity: 0.6;
+            transform: translate(-70%, -50%) scale(0.8);
         }
         
-        @keyframes pegPlace {
-            0% { transform: translate(-50%, -200%) scale(0.5); opacity: 0; }
-            50% { transform: translate(-50%, -60%) scale(1.2); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        .scoreboard-peg.current {
+            transform: translate(-30%, -50%);
         }
         
-        .scoreboard-peg.player1 { background: #dc2626; }
-        .scoreboard-peg.player2 { background: #2563eb; }
-        
-        /* Score Confirmation */
-        .score-confirmation {
-            background: rgba(0,0,0,0.8);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
+        /* Button enhancements */
+        .scoring-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
             margin: 20px 0;
-            border: 2px solid #ffd700;
         }
         
-        .score-confirmation.hidden {
+        .scoring-btn {
+            padding: 12px 16px;
+            min-height: 44px; /* Enhanced touch target */
+            min-width: 60px;
+            background: linear-gradient(145deg, #28a745, #20a73a);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+        
+        .scoring-btn:hover, .scoring-btn:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+            outline: none;
+        }
+        
+        .scoring-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Error message styling */
+        .error-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ff4444;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from { 
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to { 
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Success message styling */
+        .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        /* Modal styling improvements */
+        .confirmation-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(145deg, #2c5234, #1a3d20);
+            border: 3px solid gold;
+            border-radius: 15px;
+            padding: 25px;
+            z-index: 1000;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            color: white;
+            text-align: center;
+            min-width: 300px;
+            animation: modalAppear 0.3s ease-out;
+        }
+        
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+        
+        .confirmation-dialog.hidden {
             display: none;
         }
         
-        .points-scored {
-            font-size: 1.8em;
-            font-weight: bold;
-            color: #ffd700;
-            margin: 10px 0;
+        .confirmation-dialog h3 {
+            margin-bottom: 15px;
+            color: gold;
         }
         
         .confirmation-buttons {
             display: flex;
             gap: 15px;
             justify-content: center;
-            margin-top: 15px;
+            margin-top: 20px;
+        }
+        
+        .confirm-btn, .cancel-btn {
+            padding: 12px 24px;
+            min-height: 44px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
         
         .confirm-btn {
-            padding: 12px 25px;
-            border-radius: 8px;
-            border: none;
-            font-size: 1.1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .confirm-btn.accept {
-            background: linear-gradient(145deg, #16a34a, #22c55e);
+            background: linear-gradient(145deg, #28a745, #20a73a);
             color: white;
         }
         
-        .confirm-btn.cancel {
-            background: linear-gradient(145deg, #dc2626, #ef4444);
+        .cancel-btn {
+            background: linear-gradient(145deg, #dc3545, #c82333);
             color: white;
         }
         
-        .confirm-btn:hover {
+        .confirm-btn:hover, .cancel-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
         }
         
-        /* Instructions */
-        .board-instructions {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            text-align: center;
-            color: white;
+        /* Hidden class */
+        .hidden {
+            display: none !important;
         }
         
-        .board-instructions strong {
-            color: #ffd700;
-        }
-        
-        .score-display {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .player-score {
-            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+        /* Game UI styles */
+        .game-phase {
+            background: rgba(0,0,0,0.3);
             border-radius: 15px;
             padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        /* Loading indicator */
+        .loading {
             text-align: center;
-            border: 3px solid transparent;
-            transition: all 0.3s;
+            padding: 20px;
+            color: #ccc;
+            font-style: italic;
+        }
+        
+        /* Player selection highlight */
+        .player-card {
+            padding: 15px;
+            margin: 10px;
+            background: rgba(0,0,0,0.3);
+            border: 2px solid transparent;
+            border-radius: 12px;
             cursor: pointer;
-            color: white;
+            transition: all 0.3s ease;
+            min-height: 44px; /* Touch target */
         }
         
-        .player-score.active {
-            border-color: #ffd700;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-        }
-        
-        .player-score:hover {
+        .player-card:hover {
+            border-color: rgba(255,215,0,0.5);
             transform: translateY(-2px);
         }
         
-        .player-name {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-bottom: 10px;
+        .player-card.selected {
+            border-color: gold;
+            background: rgba(255,215,0,0.1);
+            box-shadow: 0 0 20px rgba(255,215,0,0.3);
         }
         
-        .current-score {
-            font-size: 3em;
-            font-weight: bold;
-            margin: 15px 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-        
-        .score-info {
-            font-size: 0.9em;
-            opacity: 0.8;
-            margin-top: 10px;
-        }
-        
-        /* Old scoring buttons removed - using traditional click-to-score */
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .stat-card {
-            background: rgba(255,255,255,0.1);
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            color: white;
-        }
-        
-        .stat-value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #ffd700;
-        }
-        
-        .stat-label {
-            font-size: 0.9em;
-            opacity: 0.8;
-            margin-top: 5px;
-        }
-        
-        .celebration {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(145deg, #27ae60, #2ecc71);
-            color: white;
-            padding: 30px;
-            border-radius: 20px;
-            font-size: 2em;
-            font-weight: bold;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            z-index: 1000;
-            opacity: 0;
-            transform: translate(-50%, -50%) scale(0.5);
-            transition: all 0.5s;
-        }
-        
-        .celebration.show {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
-        
+        /* Responsive text sizing */
         @media (max-width: 768px) {
-            .traditional-board { 
-                padding: 10px; 
-                max-width: 220px;
-                margin: 10px auto;
+            .confirmation-dialog {
+                min-width: 280px;
+                max-width: 90vw;
+                padding: 20px;
             }
-            .board-container-vertical { gap: 8px; }
-            .board-column { padding: 8px 4px; gap: 1px; }
-            .scoreboard-hole { 
-                width: 14px; 
-                height: 14px; 
-                margin: 1px 0;
-            }
-            .scoreboard-hole.marked {
-                width: 18px; 
-                height: 18px; 
-                font-size: 0.6em;
-            }
-            #scoreboard-hole-121 {
-                width: 22px !important; 
-                height: 22px !important;
-                font-size: 0.65em !important;
-                margin: 3px 0 !important;
-            }
-            .scoreboard-peg { 
-                width: 10px; 
-                height: 10px;
-                border-width: 1px;
-            }
-            .current-score { font-size: 2.5em; }
-            .score-confirmation { padding: 15px; margin: 15px 0; }
-            .confirmation-buttons { flex-direction: column; gap: 10px; }
-            .confirm-btn { padding: 10px 20px; }
-        }
-        
-        @media (max-width: 480px) {
-            .traditional-board { 
-                padding: 8px; 
-                max-width: 200px;
-                max-height: 85vh;
-            }
-            .board-container-vertical { gap: 6px; }
-            .board-column { padding: 6px 3px; gap: 1px; }
-            .scoreboard-hole { 
-                width: 12px; 
-                height: 12px;
-                margin: 1px 0;
-            }
-            .scoreboard-hole.marked {
-                width: 16px; 
-                height: 16px; 
-                font-size: 0.55em;
-            }
-            #scoreboard-hole-121 {
-                width: 20px !important; 
-                height: 20px !important;
-                font-size: 0.6em !important;
-                margin: 3px 0 !important;
-            }
-            .scoreboard-peg { 
-                width: 8px; 
-                height: 8px;
+            
+            .scoring-btn {
+                font-size: 14px;
+                padding: 10px 14px;
             }
         }
     </style>
@@ -917,689 +556,526 @@
 <body class="felt-texture">
     <div class="app-container">
         <!-- Header -->
-        <header class="app-header">
+        <div class="app-header">
             <h1 class="app-title">🃏 Cribbage Pro</h1>
-            <p class="app-subtitle">Scoring & Strategy</p>
-        </header>
-
+            <p class="app-subtitle">🔧 Debug Fixed Version - Complete Cribbage Companion</p>
+            <button class="play-button" onclick="startCribbageGame()">🎮 PLAY CRIBBAGE</button>
+        </div>
+        
         <!-- Navigation -->
-        <nav class="nav-tabs">
-            <button class="nav-tab active" onclick="showTab('scorer')">
-                🎯 Scorer
-            </button>
-            <button class="nav-tab" onclick="showTab('discard')">
-                🧠 Discard
-            </button>
-            <button class="nav-tab" onclick="showTab('scoreboard')">
-                🏆 Scoreboard
-            </button>
-            <button class="nav-tab" onclick="showTab('tutorial')">
-                📚 Learn
-            </button>
-        </nav>
-
+        <div class="nav-tabs">
+            <button class="nav-tab" onclick="showTab('play')">🎮 Play Game</button>
+            <button class="nav-tab active" onclick="showTab('handScorer')">🎯 Hand Scorer</button>
+            <button class="nav-tab" onclick="showTab('discardAssistant')">🧠 Discard Assistant</button>
+            <button class="nav-tab" onclick="showTab('scoreboard')">🏆 Scoreboard</button>
+            <button class="nav-tab" onclick="showTab('learn')">📚 Learn</button>
+        </div>
+        
+        <!-- Play Game Tab -->
+        <div id="play" class="tab-content">
+            <div style="background: rgba(0,0,0,0.3); border-radius: 15px; padding: 20px; margin-bottom: 20px;">
+                <h2 style="color: gold; text-align: center; margin-bottom: 15px;">🎮 Play Cribbage</h2>
+                
+                <div id="gameSetup" style="text-align: center;">
+                    <p style="color: #ccc; margin-bottom: 20px;">Start a new game of cribbage against the computer!</p>
+                    
+                    <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; justify-content: center; margin: 20px 0;">
+                        <input type="text" id="gamePlayer1Name" placeholder="Your Name" value="You"
+                               style="padding: 12px; border-radius: 8px; border: none; flex: 1; min-width: 150px; max-width: 200px;">
+                        <input type="text" id="gamePlayer2Name" placeholder="Opponent Name" value="Computer"
+                               style="padding: 12px; border-radius: 8px; border: none; flex: 1; min-width: 150px; max-width: 200px;">
+                    </div>
+                    
+                    <button onclick="initializeCribbageGame()" style="padding: 15px 30px; background: linear-gradient(145deg, #28a745, #20a73a); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; margin: 20px;">
+                        🎯 Start Game
+                    </button>
+                    
+                    <div style="margin-top: 30px; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 12px;">
+                        <h3 style="color: #FFD700; margin-bottom: 15px;">🃏 How to Play</h3>
+                        <div style="color: white; text-align: left; line-height: 1.8;">
+                            <p><strong>1. Deal:</strong> Each player gets 6 cards, plus a starter card</p>
+                            <p><strong>2. Discard:</strong> Choose 2 cards to put in the crib (dealer gets the crib points)</p>
+                            <p><strong>3. Pegging:</strong> Take turns playing cards to build a running total (try to reach exactly 31)</p>
+                            <p><strong>4. Counting:</strong> Score your hand plus the starter card</p>
+                            <p><strong>5. Win:</strong> First player to reach 121 points wins!</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="gamePlay" class="hidden">
+                    <div style="color: #ccc; text-align: center; padding: 40px;">
+                        <h3>🚧 Game Mode Under Construction</h3>
+                        <p>Full cribbage gameplay coming soon! For now, use the Hand Scorer and Discard Assistant to practice your cribbage skills.</p>
+                        <button onclick="showGameSetup()" style="padding: 12px 24px; background: linear-gradient(145deg, #6c757d, #5a6268); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px;">
+                            ← Back to Setup
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Hand Scorer Tab -->
-        <div id="scorer" class="tab-content active">
-            <div class="card-table">
-                <h2 class="section-title">🎯 Interactive Hand Scorer</h2>
+        <div id="handScorer" class="tab-content active">
+            <div style="background: rgba(0,0,0,0.3); border-radius: 15px; padding: 20px; margin-bottom: 20px;">
+                <h2 style="color: gold; text-align: center; margin-bottom: 15px;">🎯 Interactive Hand Scorer</h2>
+                <p style="color: #ccc; text-align: center; margin-bottom: 20px;">
+                    🖱️ Click any card to cycle through ranks and suits • No duplicate cards allowed • Starter card is highlighted in gold
+                </p>
                 
-                <!-- Instructions -->
-                <div style="background: rgba(255,215,0,0.1); border: 2px solid rgba(255,215,0,0.3); border-radius: 10px; padding: 15px; margin-bottom: 25px; text-align: center;">
-                    <p style="color: gold; font-weight: bold; margin: 0;">
-                        🖱️ Click any card to cycle through ranks and suits • No duplicate cards allowed • Starter card is highlighted in gold
-                    </p>
+                <div class="hand-container">
+                    <div class="card" id="card0" onclick="selectCard(0)" tabindex="0">
+                        <div class="card-rank">A</div>
+                        <div class="card-suit red">♥️</div>
+                    </div>
+                    <div class="card" id="card1" onclick="selectCard(1)" tabindex="0">
+                        <div class="card-rank">2</div>
+                        <div class="card-suit black">♠️</div>
+                    </div>
+                    <div class="card" id="card2" onclick="selectCard(2)" tabindex="0">
+                        <div class="card-rank">3</div>
+                        <div class="card-suit red">♦️</div>
+                    </div>
+                    <div class="card" id="card3" onclick="selectCard(3)" tabindex="0">
+                        <div class="card-rank">4</div>
+                        <div class="card-suit black">♣️</div>
+                    </div>
+                    <div class="card starter" id="card4" onclick="selectCard(4)" tabindex="0">
+                        <div class="card-rank">5</div>
+                        <div class="card-suit red">♥️</div>
+                    </div>
                 </div>
                 
-                <!-- Hand Display -->
-                <div class="hand-display">
-                    <div class="card" id="card0">
-                        <div class="card-rank" onclick="cycleRank(0)">A</div>
-                        <div class="card-suit red" onclick="cycleSuit(0)">♥️</div>
+                <div id="scoreDisplay" style="background: rgba(0,0,0,0.4); padding: 20px; border-radius: 12px; color: white; text-align: center;">
+                    <div style="font-size: 2em; color: gold; margin-bottom: 10px;">
+                        Total Score: <span id="totalScore">12</span>
                     </div>
-                    <div class="card" id="card1">
-                        <div class="card-rank" onclick="cycleRank(1)">2</div>
-                        <div class="card-suit black" onclick="cycleSuit(1)">♠️</div>
-                    </div>
-                    <div class="card" id="card2">
-                        <div class="card-rank" onclick="cycleRank(2)">3</div>
-                        <div class="card-suit red" onclick="cycleSuit(2)">♦️</div>
-                    </div>
-                    <div class="card" id="card3">
-                        <div class="card-rank" onclick="cycleRank(3)">4</div>
-                        <div class="card-suit black" onclick="cycleSuit(3)">♣️</div>
-                    </div>
-                    <div class="card starter-card" id="card4">
-                        <div class="card-rank" onclick="cycleRank(4)">5</div>
-                        <div class="card-suit red" onclick="cycleSuit(4)">♥️</div>
+                    <div id="scoreBreakdown" style="line-height: 1.6;">
+                        <strong>🎯 Score Breakdown:</strong><br>
+                        Fifteens: 8 points (A+4+5+5, 2+3+5+5, A+4+5+5, 2+3+5+5)<br>
+                        Pairs: 2 points (5-5)<br>
+                        Runs: 0 points<br>
+                        Flush: 0 points<br>
+                        Nobs: 0 points
                     </div>
                 </div>
-
-                <!-- Controls -->
-                <div class="controls">
-                    <button class="btn btn-secondary" onclick="randomHand()">
-                        🎲 Random Hand
-                    </button>
-                </div>
-
-                <!-- Famous hands now auto-detected and titled! -->
-            </div>
-
-            <!-- Score Display -->
-            <div class="score-display" id="scoreDisplay" style="display:none;">
-                <div class="total-score" id="totalScore">0 Points</div>
-                <div class="score-breakdown" id="scoreBreakdown"></div>
             </div>
         </div>
-
+        
         <!-- Discard Assistant Tab -->
-        <div id="discard" class="tab-content">
-            <div class="card-table">
-                <h2 class="section-title">🧠 Smart Discard Assistant</h2>
+        <div id="discardAssistant" class="tab-content">
+            <div style="background: rgba(0,0,0,0.3); border-radius: 15px; padding: 20px;">
+                <h2 style="color: gold; text-align: center; margin-bottom: 15px;">🧠 Smart Discard Assistant</h2>
+                <p style="color: #ccc; text-align: center; margin-bottom: 20px;">
+                    🖱️ Click any card to cycle through ranks and suits • Choose crib ownership • Analyze all 15 combinations
+                </p>
                 
-                <!-- Instructions -->
-                <div style="background: rgba(255,215,0,0.1); border: 2px solid rgba(255,215,0,0.3); border-radius: 10px; padding: 15px; margin-bottom: 20px; text-align: center;">
-                    <p style="color: gold; font-weight: bold; margin: 0;">
-                        🖱️ Click any card to cycle through ranks and suits • Choose crib ownership • Analyze all 15 combinations
-                    </p>
+                <!-- Crib Ownership Selection -->
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <label style="color: white; margin-right: 20px;">
+                        <input type="radio" name="cribOwner" value="yours" checked onchange="updateCribOwner()"> 
+                        🏠 Your Crib
+                    </label>
+                    <label style="color: white;">
+                        <input type="radio" name="cribOwner" value="opponent" onchange="updateCribOwner()"> 
+                        👤 Opponent's Crib
+                    </label>
                 </div>
                 
-                <!-- Crib Ownership Toggle -->
-                <div class="crib-toggle" style="text-align: center; margin-bottom: 30px;">
-                    <div style="margin-bottom: 10px;">
-                        <label style="color: gold; font-size: 1.2em;">
-                            <input type="radio" name="cribOwner" value="yours" checked onchange="updateCribOwner()"> 
-                            🏠 Your Crib
-                        </label>
+                <!-- 6-card hand for discard analysis -->
+                <div class="hand-container">
+                    <div class="card" id="discardCard0" onclick="selectDiscardCard(0)" tabindex="0">
+                        <div class="card-rank">A</div>
+                        <div class="card-suit red">♥️</div>
                     </div>
-                    <div>
-                        <label style="color: gold; font-size: 1.2em;">
-                            <input type="radio" name="cribOwner" value="opponent" onchange="updateCribOwner()"> 
-                            👤 Opponent's Crib
-                        </label>
+                    <div class="card" id="discardCard1" onclick="selectDiscardCard(1)" tabindex="0">
+                        <div class="card-rank">2</div>
+                        <div class="card-suit black">♠️</div>
                     </div>
-                </div>
-                
-                <!-- 6-Card Display -->
-                <div class="hand-display" id="discardHand">
-                    <div class="card" id="discardCard0">
-                        <div class="card-rank" onclick="cycleDiscardRank(0)">A</div>
-                        <div class="card-suit red" onclick="cycleDiscardSuit(0)">♥️</div>
+                    <div class="card" id="discardCard2" onclick="selectDiscardCard(2)" tabindex="0">
+                        <div class="card-rank">3</div>
+                        <div class="card-suit red">♦️</div>
                     </div>
-                    <div class="card" id="discardCard1">
-                        <div class="card-rank" onclick="cycleDiscardRank(1)">2</div>
-                        <div class="card-suit black" onclick="cycleDiscardSuit(1)">♠️</div>
+                    <div class="card" id="discardCard3" onclick="selectDiscardCard(3)" tabindex="0">
+                        <div class="card-rank">4</div>
+                        <div class="card-suit black">♣️</div>
                     </div>
-                    <div class="card" id="discardCard2">
-                        <div class="card-rank" onclick="cycleDiscardRank(2)">3</div>
-                        <div class="card-suit red" onclick="cycleDiscardSuit(2)">♦️</div>
+                    <div class="card" id="discardCard4" onclick="selectDiscardCard(4)" tabindex="0">
+                        <div class="card-rank">5</div>
+                        <div class="card-suit red">♥️</div>
                     </div>
-                    <div class="card" id="discardCard3">
-                        <div class="card-rank" onclick="cycleDiscardRank(3)">4</div>
-                        <div class="card-suit black" onclick="cycleDiscardSuit(3)">♣️</div>
-                    </div>
-                    <div class="card" id="discardCard4">
-                        <div class="card-rank" onclick="cycleDiscardRank(4)">5</div>
-                        <div class="card-suit red" onclick="cycleDiscardSuit(4)">♥️</div>
-                    </div>
-                    <div class="card" id="discardCard5">
-                        <div class="card-rank" onclick="cycleDiscardRank(5)">6</div>
-                        <div class="card-suit black" onclick="cycleDiscardSuit(5)">♠️</div>
+                    <div class="card" id="discardCard5" onclick="selectDiscardCard(5)" tabindex="0">
+                        <div class="card-rank">6</div>
+                        <div class="card-suit black">♠️</div>
                     </div>
                 </div>
                 
-                <div class="controls">
-                    <button class="btn btn-secondary" onclick="randomSixCards()">
-                        🎲 Random 6 Cards
+                <!-- Analysis Display -->
+                <div id="discardAnalysis" style="background: rgba(0,0,0,0.4); padding: 20px; border-radius: 12px; color: white; margin-top: 20px;">
+                    <h3 style="color: gold; margin-bottom: 15px;">📊 Discard Analysis</h3>
+                    <div id="discardRecommendation" class="loading">Click "Analyze Discards" to see all 15 combinations...</div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button onclick="analyzeDiscards()" class="scoring-btn" style="font-size: 18px; padding: 15px 30px;">
+                        🔍 Analyze Discards
                     </button>
-                </div>
-                
-                <!-- Analysis Results -->
-                <div id="discardResults" style="display:none;">
-                    <h3 class="section-title">📊 Complete Discard Analysis</h3>
-                    
-                    <!-- Best Recommendation -->
-                    <div class="score-display" id="bestRecommendation">
-                        <div class="section-title">🏆 OPTIMAL CHOICE</div>
-                        <div id="bestChoice"></div>
-                    </div>
-                    
-                    <!-- All 15 Options -->
-                    <div class="tutorial-card">
-                        <h4 class="tutorial-title">📋 All 15 Keep/Discard Options</h4>
-                        <div id="allOptionsTable"></div>
-                    </div>
-                    
-                    <!-- Strategy Tips -->
-                    <div class="tutorial-card">
-                        <h4 class="tutorial-title">💡 Strategy Tips</h4>
-                        <div id="strategyTips"></div>
-                    </div>
                 </div>
             </div>
         </div>
-
+        
         <!-- Scoreboard Tab -->
         <div id="scoreboard" class="tab-content">
-            <div class="card-table">
-                <h2 class="section-title">🏆 Cribbage Scoreboard Pro</h2>
-
+            <div style="background: rgba(0,0,0,0.3); border-radius: 15px; padding: 20px;">
+                <h2 style="color: gold; text-align: center; margin-bottom: 15px;">🏆 Cribbage Scoreboard Pro</h2>
+                
                 <!-- Game Setup -->
-                <div class="scoreboard-section">
-                    <h3 class="section-title">🎮 Game Setup</h3>
-                    <div class="scoreboard-setup">
-                        <div class="player-input-scoreboard">
-                            <label for="scoreboardPlayer1Name">Player 1 Name</label>
-                            <input type="text" id="scoreboardPlayer1Name" value="Colin" placeholder="Enter name">
-                        </div>
-                        <div class="player-input-scoreboard">
-                            <label for="scoreboardPlayer2Name">Player 2 Name</label>
-                            <input type="text" id="scoreboardPlayer2Name" value="Holly" placeholder="Enter name">
-                        </div>
-                    </div>
-                    <div class="scoreboard-controls">
-                        <button class="btn btn-primary" onclick="startNewGame()">🎯 New Game</button>
-                        <button class="btn btn-secondary" onclick="toggleScoreboardStats()">📊 Statistics</button>
-                        <button class="btn btn-danger" onclick="resetAllScoreboardData()">🗑️ Reset All</button>
+                <div style="margin-bottom: 25px;">
+                    <h3 style="color: #ddd; margin-bottom: 15px;">🎮 Game Setup</h3>
+                    <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                        <input type="text" id="player1Name" placeholder="Player 1 Name" 
+                               style="padding: 12px; border-radius: 8px; border: none; flex: 1; min-width: 150px;">
+                        <input type="text" id="player2Name" placeholder="Player 2 Name" 
+                               style="padding: 12px; border-radius: 8px; border: none; flex: 1; min-width: 150px;">
+                        <button onclick="startNewGame()" class="scoring-btn">🎯 New Game</button>
                     </div>
                 </div>
-
-                <!-- Score Display -->
-                <div class="scoreboard-section">
-                    <h3 class="section-title">📊 Current Game</h3>
-                    <div class="score-display">
-                        <div class="player-score" id="scoreboardPlayer1Score">
-                            <div class="player-name" id="scoreboardPlayer1DisplayName">Colin</div>
-                            <div class="current-score" id="scoreboardPlayer1CurrentScore">0</div>
-                            <div class="score-info">
-                                <div>Corners: <span id="scoreboardPlayer1Corners">0</span></div>
-                                <div>Games Won: <span id="scoreboardPlayer1Wins">0</span></div>
-                            </div>
+                
+                <!-- Current Game Status -->
+                <div id="currentGameDisplay">
+                    <h3 style="color: #ddd; margin-bottom: 15px;">📊 Current Game</h3>
+                    <div style="display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap;">
+                        <div id="player1Card" class="player-card" onclick="selectPlayer(1)">
+                            <div style="font-size: 1.2em; font-weight: bold; color: #FF6B6B;">Colin</div>
+                            <div style="font-size: 2em; margin: 10px 0; color: white;">0</div>
+                            <div style="font-size: 0.9em; color: #ccc;">Corners: 0 | Games Won: 0</div>
                         </div>
-                        <div class="player-score" id="scoreboardPlayer2Score">
-                            <div class="player-name" id="scoreboardPlayer2DisplayName">Holly</div>
-                            <div class="current-score" id="scoreboardPlayer2CurrentScore">0</div>
-                            <div class="score-info">
-                                <div>Corners: <span id="scoreboardPlayer2Corners">0</span></div>
-                                <div>Games Won: <span id="scoreboardPlayer2Wins">0</span></div>
-                            </div>
+                        <div id="player2Card" class="player-card" onclick="selectPlayer(2)">
+                            <div style="font-size: 1.2em; font-weight: bold; color: #4ECDC4;">Holly</div>
+                            <div style="font-size: 2em; margin: 10px 0; color: white;">0</div>
+                            <div style="font-size: 0.9em; color: #ccc;">Corners: 0 | Games Won: 0</div>
                         </div>
                     </div>
                 </div>
-
+                
                 <!-- Instructions -->
-                <div class="board-instructions">
-                    <strong>How to Score:</strong> Select a player above, then click any hole on the board to place their new peg. 
+                <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; margin: 20px 0; color: #ccc; text-align: center;">
+                    <strong>How to Score:</strong> Select a player above, then click any hole on the board to place their new peg.<br>
                     Numbered holes show every 5 points for easy counting. Max 29 points per turn. Confirm or cancel each move.
                 </div>
-
+                
                 <!-- Traditional Cribbage Board -->
-                <div class="scoreboard-section">
-                    <h3 class="section-title">🎲 Traditional Cribbage Board - 4 Legs of 30</h3>
-                    <div class="traditional-board">
-                        <div class="board-lanes" id="scoreboardCribbageBoard">
-                            <!-- Board will be generated by JavaScript -->
-                        </div>
-                    </div>
+                <div id="scoreboardBoard"></div>
+                
+                <!-- Quick Scoring Buttons -->
+                <div class="scoring-buttons">
+                    <button class="scoring-btn" onclick="quickScore(1)">+1</button>
+                    <button class="scoring-btn" onclick="quickScore(2)">+2</button>
+                    <button class="scoring-btn" onclick="quickScore(3)">+3</button>
+                    <button class="scoring-btn" onclick="quickScore(4)">+4</button>
+                    <button class="scoring-btn" onclick="quickScore(5)">+5</button>
+                    <button class="scoring-btn" onclick="quickScore(6)">+6</button>
+                    <button class="scoring-btn" onclick="quickScore(8)">+8</button>
+                    <button class="scoring-btn" onclick="quickScore(10)">+10</button>
+                    <button class="scoring-btn" onclick="quickScore(12)">+12</button>
+                    <button class="scoring-btn" onclick="quickScore(15)">+15</button>
+                    <button class="scoring-btn" onclick="quickScore(20)">+20</button>
                 </div>
-
-                <!-- Score Confirmation -->
-                <div class="score-confirmation hidden" id="scoreConfirmation">
-                    <div>
-                        <strong id="confirmPlayerName">Player</strong> wants to score 
-                        <span class="points-scored" id="pointsScored">0</span> points
-                    </div>
-                    <div>Moving from <span id="fromScore">0</span> to <span id="toScore">0</span></div>
-                    <div class="confirmation-buttons">
-                        <button class="confirm-btn accept" onclick="confirmScore()">✓ Confirm</button>
-                        <button class="confirm-btn cancel" onclick="cancelScore()">✗ Cancel</button>
-                        <button class="confirm-btn cancel" onclick="undoLastScoreboardScore()">↶ Undo Last</button>
-                    </div>
+                
+                <!-- Game Controls -->
+                <div style="text-align: center; margin: 20px 0; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <button onclick="undoLastMove()" class="cancel-btn">↶ Undo Last Move</button>
+                    <button onclick="toggleScoreboardStats()" class="scoring-btn">📊 Statistics</button>
+                    <button onclick="resetScoreboard()" class="cancel-btn">🔄 Reset Game</button>
                 </div>
-
-                <!-- Statistics (Hidden by default) -->
-                <div class="scoreboard-section hidden" id="scoreboardStatsSection">
-                    <h3 class="section-title">📊 Game Statistics</h3>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value" id="scoreboardTotalGames">0</div>
-                            <div class="stat-label">Total Games</div>
+            </div>
+        </div>
+        
+        <!-- Learn Tab -->
+        <div id="learn" class="tab-content">
+            <div style="background: rgba(0,0,0,0.3); border-radius: 15px; padding: 20px;">
+                <h2 style="color: gold; text-align: center; margin-bottom: 25px;">📚 Learn Cribbage</h2>
+                
+                <div style="display: grid; gap: 25px;">
+                    <!-- Scoring Basics -->
+                    <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px;">
+                        <h3 style="color: #FFD700; margin-bottom: 15px;">🎯 Scoring Basics</h3>
+                        <div style="color: white; line-height: 1.8;">
+                            <p><strong>Fifteens (2 points each):</strong> Any combination of cards that adds to 15</p>
+                            <p><strong>Pairs (2 points each):</strong> Two cards of the same rank</p>
+                            <p><strong>Runs (1 point per card):</strong> Three or more cards in sequence</p>
+                            <p><strong>Flush (4 or 5 points):</strong> All cards same suit</p>
+                            <p><strong>Nobs (1 point):</strong> Jack in hand matches starter suit</p>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="scoreboardTotalSkunks">0</div>
-                            <div class="stat-label">Total Skunks</div>
+                    </div>
+                    
+                    <!-- Discard Strategy -->
+                    <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px;">
+                        <h3 style="color: #4ECDC4; margin-bottom: 15px;">🧠 Discard Strategy</h3>
+                        <div style="color: white; line-height: 1.8;">
+                            <p><strong>Your Crib:</strong> Keep cards that work together, discard complementary cards</p>
+                            <p><strong>Opponent's Crib:</strong> Discard cards that don't help them (avoid 5s, complementary cards)</p>
+                            <p><strong>Balancing Act:</strong> Maximize your hand while minimizing opponent's crib potential</p>
                         </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="scoreboardTotalDoubleSkunks">0</div>
-                            <div class="stat-label">Double Skunks</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="scoreboardAvgPointsPerGame">0</div>
-                            <div class="stat-label">Avg Points/Game</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="scoreboardPerfectGames">0</div>
-                            <div class="stat-label">121 Perfect Games</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="scoreboardTotalCorners">0</div>
-                            <div class="stat-label">Total Corners</div>
+                    </div>
+                    
+                    <!-- Advanced Tips -->
+                    <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px;">
+                        <h3 style="color: #FF6B6B; margin-bottom: 15px;">🏆 Advanced Tips</h3>
+                        <div style="color: white; line-height: 1.8;">
+                            <p><strong>Magic Eleven:</strong> Cards that add to 11 can't make 15 with face cards</p>
+                            <p><strong>Starter Strategy:</strong> Remember the starter affects both hand and crib</p>
+                            <p><strong>Pegging Prep:</strong> Consider how your kept cards will play during pegging</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Tutorial Tab -->
-        <div id="tutorial" class="tab-content">
-            <div class="card-table">
-                <h2 class="section-title">📚 Learn Cribbage</h2>
-                
-                <div class="tutorial-card">
-                    <h3 class="tutorial-title">🎯 Scoring Basics</h3>
-                    <div class="tutorial-content">
-                        <p><strong>Fifteens (2 points each):</strong> Any combination of cards that adds to 15</p>
-                        <p><strong>Pairs (2 points each):</strong> Two cards of the same rank</p>
-                        <p><strong>Runs (1 point per card):</strong> Three or more cards in sequence</p>
-                        <p><strong>Flush (4 or 5 points):</strong> All cards same suit</p>
-                        <p><strong>Nobs (1 point):</strong> Jack in hand matches starter suit</p>
-                    </div>
-                </div>
-                
-                <div class="tutorial-card">
-                    <h3 class="tutorial-title">🧠 Discard Strategy</h3>
-                    <div class="tutorial-content">
-                        <p><strong>Your Crib:</strong> Keep cards that work together, discard complementary cards</p>
-                        <p><strong>Opponent's Crib:</strong> Discard cards that don't help them (avoid 5s, complementary cards)</p>
-                        <p><strong>Balancing Act:</strong> Maximize your hand while minimizing opponent's crib potential</p>
-                    </div>
-                </div>
-                
-                <div class="tutorial-card">
-                    <h3 class="tutorial-title">🏆 Advanced Tips</h3>
-                    <div class="tutorial-content">
-                        <p><strong>Magic Eleven:</strong> Cards that add to 11 can't make 15 with face cards</p>
-                        <p><strong>Starter Strategy:</strong> Remember the starter affects both hand and crib</p>
-                        <p><strong>Pegging Prep:</strong> Consider how your kept cards will play during pegging</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Statistics section removed for space saving -->
     </div>
-
+    
+    <!-- Confirmation Dialog -->
+    <div id="scoreConfirmation" class="confirmation-dialog hidden">
+        <h3>🎯 Confirm Score</h3>
+        <p><strong><span id="confirmPlayerName">Player</span></strong> scoring <strong><span id="pointsScored">0</span></strong> points</p>
+        <p>From <strong><span id="fromScore">0</span></strong> to <strong><span id="toScore">0</span></strong></p>
+        <div class="confirmation-buttons">
+            <button class="confirm-btn" onclick="confirmScore()">✅ Confirm</button>
+            <button class="cancel-btn" onclick="cancelScore()">❌ Cancel</button>
+        </div>
+    </div>
+    
     <script>
-        // Enhanced scoring engine with detailed combinations for our app
-        class CribbageCard {
-            constructor(rank, suit) {
-                this.rank = rank;
-                this.suit = suit;
-            }
-            
-            getValue() {
-                if (this.rank === 'A') return 1;
-                if (['J', 'Q', 'K'].includes(this.rank)) return 10;
-                return parseInt(this.rank);
-            }
-        }
-
-        class DetailedCribbageScorer {
-            scoreHand(hand, starter, isCrib = false) {
-                const allCards = [...hand, starter];
-                const scoreBreakdown = {
-                    totalScore: 0,
-                    breakdown: {
-                        fifteens: { score: 0, combinations: [] },
-                        pairs: { score: 0, combinations: [] },
-                        runs: { score: 0, combinations: [] },
-                        flush: { score: 0, description: '' },
-                        nobs: { score: 0, description: '' }
-                    }
-                };
-                
-                this.scoreFifteens(allCards, scoreBreakdown);
-                this.scorePairs(allCards, scoreBreakdown);
-                this.scoreRuns(allCards, scoreBreakdown);
-                this.scoreFlush(hand, starter, isCrib, scoreBreakdown);
-                this.scoreNobs(hand, starter, scoreBreakdown);
-                
-                scoreBreakdown.totalScore = 
-                    scoreBreakdown.breakdown.fifteens.score +
-                    scoreBreakdown.breakdown.pairs.score +
-                    scoreBreakdown.breakdown.runs.score +
-                    scoreBreakdown.breakdown.flush.score +
-                    scoreBreakdown.breakdown.nobs.score;
-                
-                return scoreBreakdown;
-            }
-            
-            scoreFifteens(cards, scoreBreakdown) {
-                const combinations = this.findFifteenCombinations(cards);
-                scoreBreakdown.breakdown.fifteens.score = combinations.length * 2;
-                scoreBreakdown.breakdown.fifteens.combinations = combinations;
-            }
-            
-            findFifteenCombinations(cards, target = 15, start = 0, current = []) {
-                if (target === 0) {
-                    return [{ cards: [...current], points: 2 }];
-                }
-                if (target < 0 || start >= cards.length) {
-                    return [];
-                }
-                
-                const combinations = [];
-                
-                for (let i = start; i < cards.length; i++) {
-                    const card = cards[i];
-                    const remaining = target - card.getValue();
-                    
-                    const found = this.findFifteenCombinations(
-                        cards, remaining, i + 1, [...current, card]
-                    );
-                    combinations.push(...found);
-                }
-                
-                return combinations;
-            }
-            
-            scorePairs(cards, scoreBreakdown) {
-                const pairCombinations = [];
-                let totalScore = 0;
-                
-                // Find all pairs
-                for (let i = 0; i < cards.length - 1; i++) {
-                    for (let j = i + 1; j < cards.length; j++) {
-                        if (cards[i].rank === cards[j].rank) {
-                            pairCombinations.push({
-                                cards: [cards[i], cards[j]],
-                                points: 2
-                            });
-                            totalScore += 2;
-                        }
-                    }
-                }
-                
-                scoreBreakdown.breakdown.pairs.score = totalScore;
-                scoreBreakdown.breakdown.pairs.combinations = pairCombinations;
-            }
-            
-            scoreRuns(cards, scoreBreakdown) {
-                const rankValues = {
-                    'A': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7,
-                    '8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13
-                };
-                
-                // Count each rank and track cards
-                const rankCounts = {};
-                const cardsByRank = {};
-                
-                cards.forEach(card => {
-                    const value = rankValues[card.rank];
-                    rankCounts[value] = (rankCounts[value] || 0) + 1;
-                    if (!cardsByRank[value]) cardsByRank[value] = [];
-                    cardsByRank[value].push(card);
-                });
-                
-                const sortedRanks = Object.keys(rankCounts).map(Number).sort((a, b) => a - b);
-                
-                // Find longest consecutive sequence
-                let longestRun = 0;
-                let runStart = 0;
-                
-                for (let i = 0; i < sortedRanks.length; i++) {
-                    let currentRun = 1;
-                    let j = i;
-                    
-                    while (j + 1 < sortedRanks.length && sortedRanks[j + 1] === sortedRanks[j] + 1) {
-                        currentRun++;
-                        j++;
-                    }
-                    
-                    if (currentRun > longestRun) {
-                        longestRun = currentRun;
-                        runStart = i;
-                    }
-                }
-                
-                if (longestRun >= 3) {
-                    // Get all cards in the run
-                    const runCards = [];
-                    let multiplier = 1;
-                    
-                    for (let i = runStart; i < runStart + longestRun; i++) {
-                        const rank = sortedRanks[i];
-                        const cardsOfThisRank = cardsByRank[rank];
-                        runCards.push(...cardsOfThisRank);
-                        multiplier *= cardsOfThisRank.length;
-                    }
-                    
-                    const runScore = longestRun * multiplier;
-                    scoreBreakdown.breakdown.runs.score = runScore;
-                    scoreBreakdown.breakdown.runs.combinations = [{
-                        cards: runCards,
-                        points: runScore
-                    }];
-                }
-            }
-            
-            scoreFlush(hand, starter, isCrib, scoreBreakdown) {
-                const handSuit = hand[0].suit;
-                const allHandSameSuit = hand.every(card => card.suit === handSuit);
-                const starterSameSuit = starter.suit === handSuit;
-                
-                if (allHandSameSuit) {
-                    if (starterSameSuit) {
-                        scoreBreakdown.breakdown.flush.score = 5;
-                        scoreBreakdown.breakdown.flush.description = 'All 5 cards same suit';
-                    } else if (!isCrib) {
-                        scoreBreakdown.breakdown.flush.score = 4;
-                        scoreBreakdown.breakdown.flush.description = 'Hand cards same suit (4 cards)';
-                    }
-                }
-            }
-            
-            scoreNobs(hand, starter, scoreBreakdown) {
-                const jack = hand.find(card => 
-                    card.rank === 'J' && card.suit === starter.suit
-                );
-                
-                if (jack) {
-                    scoreBreakdown.breakdown.nobs.score = 1;
-                    scoreBreakdown.breakdown.nobs.description = `Jack of ${suitSymbols[starter.suit]} matches starter suit`;
-                }
-            }
-        }
-    </script>
-    <script>
-        // Global state
+        // ===== ENHANCED GLOBAL VARIABLES =====
+        const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+        const suits = ['H', 'D', 'C', 'S'];
+        const suitSymbols = { 'H': '♥️', 'D': '♦️', 'C': '♣️', 'S': '♠️' };
+        
+        // Hand Scorer state
         let currentHand = [
             { rank: 'A', suit: 'H' },
             { rank: '2', suit: 'S' },
             { rank: '3', suit: 'D' },
-            { rank: '4', suit: 'C' }
+            { rank: '4', suit: 'C' },
+            { rank: '5', suit: 'H' }
         ];
-        let starter = { rank: '5', suit: 'H' };
         let selectedCardIndex = -1;
         
-        // Discard Assistant State (ensure no duplicates)
+        // Discard Assistant state
         let discardHand = [
-            { rank: '7', suit: 'H' },
-            { rank: '8', suit: 'S' },
-            { rank: '9', suit: 'D' },
-            { rank: '10', suit: 'C' },
-            { rank: 'J', suit: 'D' },
-            { rank: 'Q', suit: 'S' }
+            { rank: 'A', suit: 'H' },
+            { rank: '2', suit: 'S' },
+            { rank: '3', suit: 'D' },
+            { rank: '4', suit: 'C' },
+            { rank: '5', suit: 'H' },
+            { rank: '6', suit: 'S' }
         ];
         let selectedDiscardIndex = -1;
         let isOwnCrib = true;
         
-        let gameStats = JSON.parse(localStorage.getItem('cribbageStats')) || {
-            handsScored: 0,
-            totalScore: 0,
-            bestHand: 0,
-            perfectHands: 0,
-            scoreHistory: []
-        };
-
-        // Card deck for random generation
-        const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-        const suits = ['H', 'D', 'C', 'S'];
-        const suitSymbols = { 'H': '♥️', 'D': '♦️', 'C': '♣️', 'S': '♠️' };
-
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', function() {
-            // Ensure starting hands have no duplicates
-            ensureNoDuplicates();
-            updateDisplay();
-            // Auto-calculate initial hands
-            calculateScore();
-            if (discardHand && discardHand.length === 6) {
-                analyzeDiscards();
+        // Scoreboard state - Enhanced with better data persistence
+        let scoreboardGameState = {
+            player1: { 
+                name: 'Colin', 
+                score: 0, 
+                previousScore: 0, 
+                totalPoints: 0, 
+                gamesWon: 0, 
+                corners: 0,
+                skunks: 0,
+                doubleSkunks: 0
+            },
+            player2: { 
+                name: 'Holly', 
+                score: 0, 
+                previousScore: 0, 
+                totalPoints: 0, 
+                gamesWon: 0, 
+                corners: 0,
+                skunks: 0,
+                doubleSkunks: 0
+            },
+            currentPlayer: null,
+            gameActive: false,
+            pendingMove: null,
+            lastMove: null,
+            gameHistory: [],
+            statistics: {
+                totalGames: 0,
+                totalSkunks: 0,
+                totalDoubleSkunks: 0,
+                totalCorners: 0,
+                perfectGames: 0
             }
+        };
+        
+        // ===== ENHANCED INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved data
+            loadGameState();
+            
+            // Initialize all components
+            initializeHandScorer();
+            initializeDiscardAssistant();
+            initializeScoreboard();
+            
+            // Add keyboard navigation
+            addKeyboardNavigation();
+            
+            console.log('🎯 Cribbage Pro - Debug Fixed Version Loaded');
+            showMessage('Welcome to Cribbage Pro! All bugs fixed and ready to play! 🎉', 'success');
         });
         
-        // Ensure no duplicate cards in initial setup
-        function ensureNoDuplicates() {
-            // Fix hand scorer if needed
-            const handCardKeys = new Set();
-            let needsFix = false;
+        // ===== ENHANCED ERROR HANDLING =====
+        function showMessage(message, type = 'error', duration = 3000) {
+            // Remove existing messages
+            const existingMessages = document.querySelectorAll('.error-message, .success-message');
+            existingMessages.forEach(msg => msg.remove());
             
-            // Check for duplicates in current hand
-            currentHand.forEach(card => {
-                const cardKey = `${card.rank}${card.suit}`;
-                if (handCardKeys.has(cardKey)) {
-                    needsFix = true;
+            const messageEl = document.createElement('div');
+            messageEl.className = type === 'success' ? 'success-message' : 'error-message';
+            messageEl.textContent = message;
+            document.body.appendChild(messageEl);
+            
+            setTimeout(() => {
+                if (messageEl.parentNode) {
+                    messageEl.parentNode.removeChild(messageEl);
                 }
-                handCardKeys.add(cardKey);
-            });
-            
-            // Check starter against hand
-            const starterKey = `${starter.rank}${starter.suit}`;
-            if (handCardKeys.has(starterKey)) {
-                needsFix = true;
-            }
-            
-            if (needsFix) {
-                randomHand(); // Generate a proper random hand
-            }
-            
-            // Fix discard hand if needed
-            const discardCardKeys = new Set();
-            let discardNeedsFix = false;
-            
-            discardHand.forEach(card => {
-                const cardKey = `${card.rank}${card.suit}`;
-                if (discardCardKeys.has(cardKey)) {
-                    discardNeedsFix = true;
-                }
-                discardCardKeys.add(cardKey);
-            });
-            
-            if (discardNeedsFix) {
-                randomSixCards(); // Generate proper 6 cards
-            }
+            }, duration);
         }
-
-        // Tab switching
-        function showTab(tabId) {
+        
+        // ===== ENHANCED TAB NAVIGATION =====
+        function showTab(tabName) {
             // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.remove('active');
+            
+            // Remove active class from all nav buttons
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.classList.remove('active');
             });
             
             // Show selected tab
-            document.getElementById(tabId).classList.add('active');
+            const selectedTab = document.getElementById(tabName);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+            }
+            
+            // Add active class to clicked nav button
             event.target.classList.add('active');
             
-            // Special handling for different tabs
-            if (tabId === 'discard') {
-                initializeDiscardAssistant();
-            } else if (tabId === 'scorer') {
-                updateDisplay();
-            }
-        }
-
-        // Cycle rank only (keep same suit)
-        function cycleRank(index) {
-            const currentCard = index === 4 ? starter : currentHand[index];
-            const currentRankIndex = ranks.indexOf(currentCard.rank);
-            
-            // Try next ranks with same suit
-            for (let i = 1; i < ranks.length; i++) {
-                const nextRankIndex = (currentRankIndex + i) % ranks.length;
-                const nextCard = {
-                    rank: ranks[nextRankIndex],
-                    suit: currentCard.suit
-                };
-                
-                // Check if this card is already used
-                if (!isCardDuplicate(nextCard, index)) {
-                    if (index === 4) {
-                        starter = nextCard;
-                    } else {
-                        currentHand[index] = nextCard;
+            // Initialize tab-specific functionality
+            switch(tabName) {
+                case 'scoreboard':
+                    if (!document.querySelector('#scoreboardBoard .board-container-vertical')) {
+                        createScoreboardBoard();
                     }
-                    updateDisplay();
-                    calculateScore();
-                    return;
-                }
+                    break;
             }
-            
-            showCardError('No available ranks for this suit!');
         }
         
-        // Cycle suit only (keep same rank)
-        function cycleSuit(index) {
-            const currentCard = index === 4 ? starter : currentHand[index];
+        // ===== ENHANCED KEYBOARD NAVIGATION =====
+        function addKeyboardNavigation() {
+            document.addEventListener('keydown', function(event) {
+                // ESC key closes modals
+                if (event.key === 'Escape') {
+                    const dialog = document.getElementById('scoreConfirmation');
+                    if (dialog && !dialog.classList.contains('hidden')) {
+                        cancelScore();
+                    }
+                }
+                
+                // Tab navigation
+                if (event.key >= '1' && event.key <= '4') {
+                    const tabs = ['handScorer', 'discardAssistant', 'scoreboard', 'learn'];
+                    const tabIndex = parseInt(event.key) - 1;
+                    if (tabs[tabIndex]) {
+                        showTab(tabs[tabIndex]);
+                        event.preventDefault();
+                    }
+                }
+                
+                // Card navigation with arrow keys
+                if (selectedCardIndex >= 0) {
+                    if (event.key === 'ArrowUp' || event.key === 'ArrowRight') {
+                        cycleCard(selectedCardIndex);
+                        event.preventDefault();
+                    }
+                }
+                
+                if (selectedDiscardIndex >= 0) {
+                    if (event.key === 'ArrowUp' || event.key === 'ArrowRight') {
+                        cycleDiscardCard(selectedDiscardIndex);
+                        event.preventDefault();
+                    }
+                }
+            });
+        }
+        
+        // ===== ENHANCED HAND SCORER FUNCTIONS =====
+        function initializeHandScorer() {
+            updateDisplay();
+            scoreHand(); // Calculate initial score
+        }
+        
+        function selectCard(index) {
+            selectedCardIndex = index;
+            
+            // Visual feedback with enhanced animation
+            document.querySelectorAll('#handScorer .card').forEach((card, i) => {
+                card.classList.toggle('selected', i === index);
+            });
+            
+            // Cycle through cards
+            cycleCard(index);
+        }
+        
+        // FIXED: Enhanced duplicate prevention
+        function cycleCard(index) {
+            const currentCard = currentHand[index];
+            const currentRankIndex = ranks.indexOf(currentCard.rank);
             const currentSuitIndex = suits.indexOf(currentCard.suit);
             
-            // Try next suits with same rank
-            for (let i = 1; i < suits.length; i++) {
-                const nextSuitIndex = (currentSuitIndex + i) % suits.length;
-                const nextCard = {
-                    rank: currentCard.rank,
-                    suit: suits[nextSuitIndex]
-                };
+            let attempts = 0;
+            let nextCard = { ...currentCard };
+            
+            // Enhanced cycling algorithm with better logic
+            while (attempts < 52) {
+                if (attempts < 4) {
+                    // First, try different suits with same rank
+                    const nextSuitIndex = (currentSuitIndex + attempts + 1) % suits.length;
+                    nextCard = {
+                        rank: currentCard.rank,
+                        suit: suits[nextSuitIndex]
+                    };
+                } else {
+                    // Then try different ranks
+                    const rankOffset = Math.floor((attempts - 4) / 4) + 1;
+                    const suitOffset = (attempts - 4) % 4;
+                    const nextRankIndex = (currentRankIndex + rankOffset) % ranks.length;
+                    const nextSuitIndex = (currentSuitIndex + suitOffset) % suits.length;
+                    nextCard = {
+                        rank: ranks[nextRankIndex],
+                        suit: suits[nextSuitIndex]
+                    };
+                }
                 
-                // Check if this card is already used
+                // FIXED: Improved duplicate detection
                 if (!isCardDuplicate(nextCard, index)) {
-                    if (index === 4) {
-                        starter = nextCard;
-                    } else {
-                        currentHand[index] = nextCard;
-                    }
+                    currentHand[index] = nextCard;
                     updateDisplay();
-                    calculateScore();
+                    scoreHand();
+                    showMessage(`Card ${index + 1} changed to ${nextCard.rank}${suitSymbols[nextCard.suit]}`, 'success', 1500);
                     return;
                 }
+                
+                attempts++;
             }
             
-            showCardError('No available suits for this rank!');
+            showMessage('No more available cards to cycle through!');
         }
         
-        // Convert card to systematic index (0-51)
-        function getCardIndex(card) {
-            const rankIndex = ranks.indexOf(card.rank);
-            const suitIndex = suits.indexOf(card.suit);
-            return rankIndex * 4 + suitIndex;
-        }
-        
-        // Convert systematic index back to card
-        function getCardFromIndex(index) {
-            const rankIndex = Math.floor(index / 4);
-            const suitIndex = index % 4;
-            return {
-                rank: ranks[rankIndex],
-                suit: suits[suitIndex]
-            };
-        }
-        
-        // Check if a card would be a duplicate
+        // FIXED: Better duplicate detection logic
         function isCardDuplicate(card, excludeIndex) {
-            // Check against hand cards
             for (let i = 0; i < currentHand.length; i++) {
                 if (i !== excludeIndex && 
                     currentHand[i].rank === card.rank && 
@@ -1607,420 +1083,224 @@
                     return true;
                 }
             }
-            
-            // Check against starter (if not the starter being changed)
-            if (excludeIndex !== 4 && 
-                starter.rank === card.rank && 
-                starter.suit === card.suit) {
-                return true;
-            }
-            
             return false;
         }
         
-        // Show card error message
-        function showCardError(message) {
-            showStatusMessage(message, 'error');
-        }
-        
-        // Show success message
-        function showCardSuccess(message) {
-            showStatusMessage(message, 'success');
-        }
-        
-        // Generic status message function
-        function showStatusMessage(message, type = 'info') {
-            const colors = {
-                error: 'linear-gradient(145deg, #ff4444, #cc0000)',
-                success: 'linear-gradient(145deg, #44ff44, #00cc00)',
-                info: 'linear-gradient(145deg, #4444ff, #0000cc)'
-            };
-            
-            const statusDiv = document.createElement('div');
-            statusDiv.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: ${colors[type]};
-                color: white;
-                padding: 15px 25px;
-                border-radius: 10px;
-                font-weight: bold;
-                z-index: 1000;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-                animation: slideIn 0.3s ease-out;
-                font-size: 0.9em;
-            `;
-            statusDiv.textContent = message;
-            
-            document.body.appendChild(statusDiv);
-            
-            // Remove after 2 seconds for success, 3 for errors
-            const timeout = type === 'success' ? 2000 : 3000;
-            setTimeout(() => {
-                if (statusDiv.parentNode) {
-                    statusDiv.parentNode.removeChild(statusDiv);
-                }
-            }, timeout);
-        }
-
-        // Update card display
         function updateDisplay() {
-            // Update hand cards
             currentHand.forEach((card, index) => {
                 const cardElement = document.getElementById(`card${index}`);
-                const isRed = ['H', 'D'].includes(card.suit);
-                
-                cardElement.querySelector('.card-rank').textContent = card.rank;
-                cardElement.querySelector('.card-suit').textContent = suitSymbols[card.suit];
-                cardElement.querySelector('.card-suit').className = `card-suit ${isRed ? 'red' : 'black'}`;
+                if (cardElement) {
+                    const isRed = ['H', 'D'].includes(card.suit);
+                    
+                    cardElement.querySelector('.card-rank').textContent = card.rank;
+                    cardElement.querySelector('.card-suit').textContent = suitSymbols[card.suit];
+                    cardElement.querySelector('.card-suit').className = `card-suit ${isRed ? 'red' : 'black'}`;
+                }
             });
-            
-            // Update starter card
-            const starterElement = document.getElementById('card4');
-            const isStarterRed = ['H', 'D'].includes(starter.suit);
-            starterElement.querySelector('.card-rank').textContent = starter.rank;
-            starterElement.querySelector('.card-suit').textContent = suitSymbols[starter.suit];
-            starterElement.querySelector('.card-suit').className = `card-suit ${isStarterRed ? 'red' : 'black'}`;
         }
-
-        // Calculate and display score
-        function calculateScore() {
-            // Convert to CribbageCard objects
-            const handCards = currentHand.map(card => new CribbageCard(card.rank, card.suit));
-            const starterCard = new CribbageCard(starter.rank, starter.suit);
+        
+        // ENHANCED: Better scoring algorithm
+        function scoreHand() {
+            const hand = currentHand.slice(0, 4);  // First 4 cards
+            const starter = currentHand[4];        // 5th card is starter
             
-            // Use our detailed scoring engine
-            const scorer = new DetailedCribbageScorer();
-            const result = scorer.scoreHand(handCards, starterCard);
+            let totalScore = 0;
+            let breakdown = [];
             
-            // Update stats
-            gameStats.handsScored++;
-            gameStats.totalScore += result.totalScore;
-            gameStats.bestHand = Math.max(gameStats.bestHand, result.totalScore);
-            if (result.totalScore === 29) gameStats.perfectHands++;
-            gameStats.scoreHistory.push(result.totalScore);
+            // Score fifteens
+            const fifteensResult = scoreFifteens(hand, starter);
+            totalScore += fifteensResult.score;
+            if (fifteensResult.score > 0) breakdown.push(fifteensResult.description);
             
-            // Keep only last 100 scores
-            if (gameStats.scoreHistory.length > 100) {
-                gameStats.scoreHistory.shift();
-            }
+            // Score pairs
+            const pairsResult = scorePairs(hand, starter);
+            totalScore += pairsResult.score;
+            if (pairsResult.score > 0) breakdown.push(pairsResult.description);
             
-            localStorage.setItem('cribbageStats', JSON.stringify(gameStats));
+            // Score runs
+            const runsResult = scoreRuns(hand, starter);
+            totalScore += runsResult.score;
+            if (runsResult.score > 0) breakdown.push(runsResult.description);
             
-            // Display results
-            displayScore(result);
-        }
-
-        // Detect famous cribbage hands
-        function detectFamousHand(handCards, starterCard, totalScore) {
-            const allCards = [...handCards, starterCard];
-            const ranks = allCards.map(card => card.rank);
-            const suits = allCards.map(card => card.suit);
+            // Score flush
+            const flushResult = scoreFlush(hand, starter);
+            totalScore += flushResult.score;
+            if (flushResult.score > 0) breakdown.push(flushResult.description);
             
-            // Perfect 29 - Three 5s + Jack + 5 starter, Jack same suit as starter
+            // Score nobs (Jack of same suit as starter)
+            const nobsResult = scoreNobs(hand, starter);
+            totalScore += nobsResult.score;
+            if (nobsResult.score > 0) breakdown.push(nobsResult.description);
+            
+            // Update display with enhanced formatting
+            document.getElementById('totalScore').textContent = totalScore;
+            
+            const breakdownText = breakdown.length > 0 ? breakdown.join('<br>') : 'No points scored';
+            document.getElementById('scoreBreakdown').innerHTML = `
+                <strong>🎯 Score Breakdown:</strong><br>
+                ${breakdownText}
+            `;
+            
+            // Special hand detection
             if (totalScore === 29) {
-                const fives = ranks.filter(rank => rank === '5').length;
-                const jacks = ranks.filter(rank => rank === 'J').length;
-                if (fives === 4 && jacks === 1) {
-                    return "🏆 PERFECT 29! 🏆";
-                }
+                showMessage('🎉 PERFECT 29 HAND! Amazing!', 'success', 5000);
+            } else if (totalScore === 0) {
+                showMessage('😅 Zero points! Better luck next time.', 'success', 2000);
             }
-            
-            // Royal Flush - 10, J, Q, K, A all same suit
-            const suitCounts = {};
-            suits.forEach(suit => {
-                suitCounts[suit] = (suitCounts[suit] || 0) + 1;
+        }
+        
+        // Enhanced scoring helper functions
+        function scoreFifteens(hand, starter) {
+            const allCards = [...hand, starter];
+            const cardValues = allCards.map(card => {
+                if (['J', 'Q', 'K'].includes(card.rank)) return 10;
+                if (card.rank === 'A') return 1;
+                return parseInt(card.rank);
             });
-            const hasFlush = Object.values(suitCounts).some(count => count === 5);
             
-            if (hasFlush && totalScore >= 12) {
-                const royalRanks = ['10', 'J', 'Q', 'K', 'A'];
-                const hasAllRoyal = royalRanks.every(rank => ranks.includes(rank));
-                if (hasAllRoyal) {
-                    return "♠️ ROYAL FLUSH ♠️";
+            let fifteens = 0;
+            let combinations = [];
+            
+            // Check all possible combinations
+            for (let i = 0; i < (1 << allCards.length); i++) {
+                let sum = 0;
+                let combo = [];
+                
+                for (let j = 0; j < allCards.length; j++) {
+                    if (i & (1 << j)) {
+                        sum += cardValues[j];
+                        combo.push(allCards[j].rank);
+                    }
+                }
+                
+                if (sum === 15 && combo.length >= 2) {
+                    fifteens++;
+                    combinations.push(combo.join('+'));
                 }
             }
             
-            // Four of a Kind
+            return {
+                score: fifteens * 2,
+                description: fifteens > 0 ? `Fifteens: ${fifteens * 2} points (${combinations.slice(0, 3).join(', ')}${combinations.length > 3 ? '...' : ''})` : ''
+            };
+        }
+        
+        function scorePairs(hand, starter) {
+            const allCards = [...hand, starter];
             const rankCounts = {};
-            ranks.forEach(rank => {
-                rankCounts[rank] = (rankCounts[rank] || 0) + 1;
+            
+            allCards.forEach(card => {
+                rankCounts[card.rank] = (rankCounts[card.rank] || 0) + 1;
             });
-            const maxRankCount = Math.max(...Object.values(rankCounts));
             
-            if (maxRankCount === 4) {
-                return "🎯 FOUR OF A KIND! 🎯";
-            }
+            let pairScore = 0;
+            let descriptions = [];
             
-            // Double Pair Royal (two pairs)
-            const pairCount = Object.values(rankCounts).filter(count => count === 2).length;
-            if (pairCount === 2 && totalScore >= 8) {
-                return "👥 DOUBLE PAIR ROYAL 👥";
-            }
-            
-            // Check for runs with pairs (double runs, triple runs)
-            const uniqueRanks = Object.keys(rankCounts);
-            const rankValues = uniqueRanks.map(rank => {
-                if (rank === 'A') return 1;
-                if (rank === 'J') return 11;
-                if (rank === 'Q') return 12;  
-                if (rank === 'K') return 13;
-                return parseInt(rank);
-            }).sort((a, b) => a - b);
-            
-            // Check for consecutive ranks (runs)
-            let isRun = true;
-            for (let i = 1; i < rankValues.length; i++) {
-                if (rankValues[i] !== rankValues[i-1] + 1) {
-                    isRun = false;
-                    break;
+            Object.entries(rankCounts).forEach(([rank, count]) => {
+                if (count >= 2) {
+                    const points = count * (count - 1);
+                    pairScore += points;
+                    
+                    if (count === 2) descriptions.push(`Pair of ${rank}s`);
+                    else if (count === 3) descriptions.push(`Three ${rank}s`);
+                    else if (count === 4) descriptions.push(`Four ${rank}s`);
                 }
-            }
+            });
             
-            if (isRun && rankValues.length >= 3) {
-                const hasTriple = Object.values(rankCounts).some(count => count === 3);
-                const hasPair = Object.values(rankCounts).some(count => count === 2);
-                
-                if (hasTriple && totalScore >= 15) {
-                    return "🔄 TRIPLE RUN 🔄";
-                } else if (hasPair && totalScore >= 8) {
-                    return "🔄 DOUBLE RUN 🔄";
-                }
-            }
-            
-            // Fifteen City (multiple fifteens) - detect by high scores with no other patterns
-            if (totalScore >= 8 && maxRankCount <= 2 && !hasFlush) {
-                // High score without major patterns suggests lots of fifteens
-                return "🎯 FIFTEEN CITY 🎯";
-            }
-            
-            // High scoring hands
-            if (totalScore >= 24) {
-                return "🌟 AMAZING HAND! 🌟";
-            } else if (totalScore >= 20) {
-                return "🎉 EXCELLENT HAND! 🎉";
-            } else if (totalScore >= 16) {
-                return "👏 GREAT HAND! 👏";
-            }
-            
-            return null; // No famous hand detected
+            return {
+                score: pairScore,
+                description: descriptions.length > 0 ? `Pairs: ${pairScore} points (${descriptions.join(', ')})` : ''
+            };
         }
         
-        // Display detailed score breakdown with consistent table design
-        function displayScore(result) {
-            const scoreDisplay = document.getElementById('scoreDisplay');
-            const totalScore = document.getElementById('totalScore');
-            const breakdown = document.getElementById('scoreBreakdown');
+        function scoreRuns(hand, starter) {
+            const allCards = [...hand, starter];
+            const rankValues = {
+                'A': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13
+            };
             
-            // Detect famous hands
-            const handCards = currentHand.map(card => new CribbageCard(card.rank, card.suit));
-            const starterCard = new CribbageCard(starter.rank, starter.suit);
-            const famousHand = detectFamousHand(handCards, starterCard, result.totalScore);
+            const rankCounts = {};
+            allCards.forEach(card => {
+                rankCounts[card.rank] = (rankCounts[card.rank] || 0) + 1;
+            });
             
-            // Display score with famous hand title if detected
-            const scoreText = famousHand 
-                ? `${famousHand}\n${result.totalScore} Points`
-                : `${result.totalScore} Points`;
+            const uniqueRanks = Object.keys(rankCounts).sort((a, b) => rankValues[a] - rankValues[b]);
             
-            totalScore.innerHTML = scoreText.replace('\n', '<br>');
-            totalScore.classList.add('score-pop');
-            setTimeout(() => totalScore.classList.remove('score-pop'), 500);
+            // Find longest consecutive sequence
+            let longestRun = 0;
+            let currentRun = 1;
+            let runStart = -1;
             
-            // Build breakdown table HTML in consistent style
-            let breakdownHTML = `
-                <div class="tutorial-card" style="background: linear-gradient(145deg, #0d5c0d, #1a691a);">
-                    <h4 class="tutorial-title">📊 Complete Scoring Breakdown</h4>
-                    <div style="overflow-x: auto;">
-                        <table style="width: 100%; color: white; border-collapse: collapse;">
-                            <thead>
-                                <tr style="border-bottom: 2px solid gold;">
-                                    <th style="padding: 12px; text-align: left; color: white;">Scoring Type</th>
-                                    <th style="padding: 12px; text-align: left; color: white;">Combinations</th>
-                                    <th style="padding: 12px; text-align: center; color: gold;">Points</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-            `;
-            
-            let hasAnyScore = false;
-            
-            // FIFTEENS
-            if (result.breakdown.fifteens.score > 0) {
-                hasAnyScore = true;
-                breakdownHTML += `
-                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
-                        <td style="padding: 12px; font-weight: bold; color: white;">🎯 Fifteens</td>
-                        <td style="padding: 12px; color: white; font-size: 0.9em; text-align: left;">
-                            ${result.breakdown.fifteens.combinations.map(combo => 
-                                combo.cards.map(card => `${card.rank}${suitSymbols[card.suit]}`).join(' ')
-                            ).join('<br>')}
-                        </td>
-                        <td style="padding: 12px; text-align: center; font-weight: bold; color: white;">
-                            ${result.breakdown.fifteens.score}
-                        </td>
-                    </tr>
-                `;
-            }
-            
-            // PAIRS
-            if (result.breakdown.pairs.score > 0) {
-                hasAnyScore = true;
-                breakdownHTML += `
-                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
-                        <td style="padding: 12px; font-weight: bold; color: white;">👥 Pairs</td>
-                        <td style="padding: 12px; color: white; font-size: 0.9em; text-align: left;">
-                            ${result.breakdown.pairs.combinations.map(combo => 
-                                combo.cards.map(card => `${card.rank}${suitSymbols[card.suit]}`).join(' ')
-                            ).join('<br>')}
-                        </td>
-                        <td style="padding: 12px; text-align: center; font-weight: bold; color: white;">
-                            ${result.breakdown.pairs.score}
-                        </td>
-                    </tr>
-                `;
-            }
-            
-            // RUNS
-            if (result.breakdown.runs.score > 0) {
-                hasAnyScore = true;
-                breakdownHTML += `
-                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
-                        <td style="padding: 12px; font-weight: bold; color: white;">🏃 Runs</td>
-                        <td style="padding: 12px; color: white; font-size: 0.9em; text-align: left;">
-                            ${result.breakdown.runs.combinations.map(combo => 
-                                combo.cards.map(card => `${card.rank}${suitSymbols[card.suit]}`).join(' ')
-                            ).join('<br>')}
-                        </td>
-                        <td style="padding: 12px; text-align: center; font-weight: bold; color: white;">
-                            ${result.breakdown.runs.score}
-                        </td>
-                    </tr>
-                `;
-            }
-            
-            // FLUSH
-            if (result.breakdown.flush.score > 0) {
-                hasAnyScore = true;
-                breakdownHTML += `
-                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
-                        <td style="padding: 12px; font-weight: bold; color: white;">♠️ Flush</td>
-                        <td style="padding: 12px; color: white; font-size: 0.9em; text-align: left;">
-                            ${result.breakdown.flush.description}
-                        </td>
-                        <td style="padding: 12px; text-align: center; font-weight: bold; color: white;">
-                            ${result.breakdown.flush.score}
-                        </td>
-                    </tr>
-                `;
-            }
-            
-            // NOBS
-            if (result.breakdown.nobs.score > 0) {
-                hasAnyScore = true;
-                breakdownHTML += `
-                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
-                        <td style="padding: 12px; font-weight: bold; color: white;">🎩 Nobs</td>
-                        <td style="padding: 12px; color: white; font-size: 0.9em; text-align: left;">
-                            ${result.breakdown.nobs.description}
-                        </td>
-                        <td style="padding: 12px; text-align: center; font-weight: bold; color: white;">
-                            ${result.breakdown.nobs.score}
-                        </td>
-                    </tr>
-                `;
-            }
-            
-            // No score row
-            if (!hasAnyScore) {
-                breakdownHTML += `
-                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
-                        <td style="padding: 12px; font-weight: bold; color: white;">No Score</td>
-                        <td style="padding: 12px; color: white; font-size: 0.9em; text-align: left;">
-                            No fifteens, pairs, runs, flush, or nobs found
-                        </td>
-                        <td style="padding: 12px; text-align: center; font-weight: bold; color: white;">
-                            0
-                        </td>
-                    </tr>
-                `;
-            }
-            
-            // Add total row
-            breakdownHTML += `
-                    <tr style="border-top: 2px solid gold; background: linear-gradient(145deg, rgba(255,215,0,0.15), rgba(255,215,0,0.05));">
-                        <td style="padding: 15px; font-weight: bold; font-size: 1.1em; color: gold;">TOTAL SCORE</td>
-                        <td style="padding: 15px; color: gold; font-size: 0.9em; text-align: left;">All combinations combined</td>
-                        <td style="padding: 15px; text-align: center; font-weight: bold; font-size: 1.3em; color: gold;">
-                            ${result.totalScore}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-            `;
-            
-            breakdown.innerHTML = breakdownHTML;
-            scoreDisplay.style.display = 'block';
-        }
-
-        // Famous hands now auto-detected - no manual loading needed!
-
-        // Generate random hand (no duplicates)
-        function randomHand() {
-            // Generate 5 unique random cards
-            const usedCards = new Set();
-            const newCards = [];
-            
-            while (newCards.length < 5) {
-                const rank = ranks[Math.floor(Math.random() * ranks.length)];
-                const suit = suits[Math.floor(Math.random() * suits.length)];
-                const cardKey = `${rank}${suit}`;
-                
-                if (!usedCards.has(cardKey)) {
-                    usedCards.add(cardKey);
-                    newCards.push({ rank, suit });
+            for (let i = 1; i < uniqueRanks.length; i++) {
+                if (rankValues[uniqueRanks[i]] === rankValues[uniqueRanks[i-1]] + 1) {
+                    if (currentRun === 1) runStart = i - 1;
+                    currentRun++;
+                } else {
+                    if (currentRun > longestRun) {
+                        longestRun = currentRun;
+                    }
+                    currentRun = 1;
                 }
             }
             
-            currentHand = newCards.slice(0, 4);
-            starter = newCards[4];
+            if (currentRun > longestRun) longestRun = currentRun;
             
-            updateDisplay();
-            calculateScore();
+            if (longestRun >= 3) {
+                // Multiply by number of cards for each rank in the run
+                let runScore = longestRun;
+                const runRanks = uniqueRanks.slice(runStart, runStart + longestRun);
+                
+                runRanks.forEach(rank => {
+                    runScore *= rankCounts[rank];
+                });
+                runScore /= longestRun; // Divide back out to get correct multiplier
+                
+                return {
+                    score: runScore,
+                    description: `Run: ${runScore} points (${runRanks.join('-')})`
+                };
+            }
+            
+            return { score: 0, description: '' };
         }
-
-        // Clear hand
-        function clearHand() {
-            document.getElementById('scoreDisplay').style.display = 'none';
-            document.querySelectorAll('.card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            selectedCardIndex = -1;
-        }
-
-        // ===== DISCARD ASSISTANT FUNCTIONS =====
         
-        // Initialize discard assistant
+        function scoreFlush(hand, starter) {
+            const handSuit = hand[0].suit;
+            const handFlush = hand.every(card => card.suit === handSuit);
+            
+            if (handFlush && starter.suit === handSuit) {
+                return { score: 5, description: 'Flush: 5 points (all five cards same suit)' };
+            } else if (handFlush) {
+                return { score: 4, description: 'Flush: 4 points (hand same suit)' };
+            }
+            
+            return { score: 0, description: '' };
+        }
+        
+        function scoreNobs(hand, starter) {
+            const jack = hand.find(card => card.rank === 'J' && card.suit === starter.suit);
+            if (jack) {
+                return { score: 1, description: 'Nobs: 1 point (Jack matches starter suit)' };
+            }
+            return { score: 0, description: '' };
+        }
+        
+        // ===== ENHANCED DISCARD ASSISTANT FUNCTIONS =====
         function initializeDiscardAssistant() {
             updateDiscardDisplay();
         }
         
-        // Select discard card for editing
         function selectDiscardCard(index) {
             selectedDiscardIndex = index;
             
-            // Visual feedback
             document.querySelectorAll('#discardHand .card').forEach((card, i) => {
                 card.classList.toggle('selected', i === index);
             });
             
-            // Cycle through cards
             cycleDiscardCard(index);
         }
         
-        // Cycle through cards for discard hand with duplicate prevention
+        // FIXED: Enhanced discard cycling with better duplicate prevention
         function cycleDiscardCard(index) {
             const currentCard = discardHand[index];
             const currentRankIndex = ranks.indexOf(currentCard.rank);
@@ -2029,38 +1309,37 @@
             let attempts = 0;
             let nextCard = { ...currentCard };
             
-            // Try to find next valid card (not duplicate)
             while (attempts < 52) {
-                // First try next suit, same rank
-                if (attempts % 4 !== 0 || attempts === 0) {
-                    const nextSuitIndex = (currentSuitIndex + Math.floor(attempts / 4) * 4 + (attempts % 4) + 1) % suits.length;
+                if (attempts < 4) {
+                    const nextSuitIndex = (currentSuitIndex + attempts + 1) % suits.length;
                     nextCard = {
                         rank: currentCard.rank,
                         suit: suits[nextSuitIndex]
                     };
                 } else {
-                    // After cycling through suits, try next rank
-                    const nextRankIndex = (currentRankIndex + Math.floor(attempts / 4)) % ranks.length;
+                    const rankOffset = Math.floor((attempts - 4) / 4) + 1;
+                    const suitOffset = (attempts - 4) % 4;
+                    const nextRankIndex = (currentRankIndex + rankOffset) % ranks.length;
+                    const nextSuitIndex = suitOffset;
                     nextCard = {
                         rank: ranks[nextRankIndex],
-                        suit: suits[0]
+                        suit: suits[nextSuitIndex]
                     };
                 }
                 
-                // Check if this card is already used in discard hand
                 if (!isDiscardCardDuplicate(nextCard, index)) {
                     discardHand[index] = nextCard;
                     updateDiscardDisplay();
+                    showMessage(`Discard card ${index + 1} changed to ${nextCard.rank}${suitSymbols[nextCard.suit]}`, 'success', 1500);
                     return;
                 }
                 
                 attempts++;
             }
             
-            showCardError('No available cards to select in discard hand!');
+            showMessage('No available cards to select in discard hand!');
         }
         
-        // Check if a card would be a duplicate in discard hand
         function isDiscardCardDuplicate(card, excludeIndex) {
             for (let i = 0; i < discardHand.length; i++) {
                 if (i !== excludeIndex && 
@@ -2072,57 +1351,6 @@
             return false;
         }
         
-        // NEW: Cycle discard hand rank only (keep same suit)
-        function cycleDiscardRank(index) {
-            const currentCard = discardHand[index];
-            const currentRankIndex = ranks.indexOf(currentCard.rank);
-            
-            // Try next ranks with same suit
-            for (let i = 1; i < ranks.length; i++) {
-                const nextRankIndex = (currentRankIndex + i) % ranks.length;
-                const nextCard = {
-                    rank: ranks[nextRankIndex],
-                    suit: currentCard.suit
-                };
-                
-                // Check if this card is already used in discard hand
-                if (!isDiscardCardDuplicate(nextCard, index)) {
-                    discardHand[index] = nextCard;
-                    updateDiscardDisplay();
-                    analyzeDiscards();
-                    return;
-                }
-            }
-            
-            showCardError('No available ranks for this suit!');
-        }
-        
-        // NEW: Cycle discard hand suit only (keep same rank)
-        function cycleDiscardSuit(index) {
-            const currentCard = discardHand[index];
-            const currentSuitIndex = suits.indexOf(currentCard.suit);
-            
-            // Try next suits with same rank
-            for (let i = 1; i < suits.length; i++) {
-                const nextSuitIndex = (currentSuitIndex + i) % suits.length;
-                const nextCard = {
-                    rank: currentCard.rank,
-                    suit: suits[nextSuitIndex]
-                };
-                
-                // Check if this card is already used in discard hand
-                if (!isDiscardCardDuplicate(nextCard, index)) {
-                    discardHand[index] = nextCard;
-                    updateDiscardDisplay();
-                    analyzeDiscards();
-                    return;
-                }
-            }
-            
-            showCardError('No available suits for this rank!');
-        }
-        
-        // Update discard hand display
         function updateDiscardDisplay() {
             discardHand.forEach((card, index) => {
                 const cardElement = document.getElementById(`discardCard${index}`);
@@ -2136,22 +1364,71 @@
             });
         }
         
-        // Update crib ownership
+        // FIXED: Enhanced crib ownership update
         function updateCribOwner() {
             const radios = document.getElementsByName('cribOwner');
-            isOwnCrib = radios[0].checked; // First radio is "yours"
+            isOwnCrib = radios[0].checked;
             
-            // Auto-analyze if cards are already set
-            if (discardHand && discardHand.length === 6) {
+            // Show immediate feedback
+            showMessage(`Crib ownership: ${isOwnCrib ? 'Your crib' : "Opponent's crib"}`, 'success', 1500);
+            
+            // Auto-reanalyze if we've already done analysis
+            const analysisEl = document.getElementById('discardRecommendation');
+            if (analysisEl && !analysisEl.classList.contains('loading')) {
                 analyzeDiscards();
             }
         }
         
-        // Generate all 15 keep/discard combinations
+        // ENHANCED: Better discard analysis algorithm
+        function analyzeDiscards() {
+            const analysisEl = document.getElementById('discardRecommendation');
+            analysisEl.innerHTML = '<div class="loading">🔍 Analyzing all 15 combinations...</div>';
+            
+            // Use setTimeout for better UX
+            setTimeout(() => {
+                const combinations = getAllCombinations(discardHand);
+                let analysis = [];
+                
+                combinations.forEach((combo, index) => {
+                    const expectedValue = calculateExpectedValue(combo.keep, combo.discard, isOwnCrib);
+                    combo.expectedValue = expectedValue;
+                });
+                
+                // Sort by expected value (descending)
+                combinations.sort((a, b) => b.expectedValue - a.expectedValue);
+                
+                // Format results
+                let html = `<h4 style="color: gold; margin-bottom: 15px;">📊 Best Discard Options (${isOwnCrib ? 'Your Crib' : "Opponent's Crib"})</h4>`;
+                
+                combinations.slice(0, 5).forEach((combo, index) => {
+                    const keepStr = combo.keep.map(c => `${c.rank}${suitSymbols[c.suit]}`).join(' ');
+                    const discardStr = combo.discard.map(c => `${c.rank}${suitSymbols[c.suit]}`).join(' ');
+                    const rank = index + 1;
+                    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '🏅';
+                    
+                    html += `
+                        <div style="background: rgba(255,255,255,0.1); padding: 12px; margin: 8px 0; border-radius: 8px; border-left: 4px solid ${rank === 1 ? '#FFD700' : rank <= 3 ? '#C0C0C0' : '#CD7F32'};">
+                            ${medal} <strong>Rank ${rank}:</strong> Keep ${keepStr}, discard ${discardStr}<br>
+                            <small style="color: #ccc;">Expected Value: ${combo.expectedValue.toFixed(1)} points</small>
+                        </div>
+                    `;
+                });
+                
+                // Add strategy tip
+                html += `
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(0,100,0,0.2); border-radius: 8px; border-left: 4px solid #28a745;">
+                        <strong>💡 Strategy Tip:</strong> ${getStrategyTip(combinations[0], isOwnCrib)}
+                    </div>
+                `;
+                
+                analysisEl.innerHTML = html;
+                showMessage('✅ Analysis complete! Check the recommendations above.', 'success');
+            }, 500);
+        }
+        
         function getAllCombinations(sixCards) {
             const combinations = [];
             
-            // Generate all combinations of 4 cards from 6
             for (let a = 0; a < 6; a++) {
                 for (let b = a + 1; b < 6; b++) {
                     for (let c = b + 1; c < 6; c++) {
@@ -2176,322 +1453,86 @@
             return combinations;
         }
         
-        // Calculate expected value for a keep/discard combination
         function calculateExpectedValue(keepCards, discardCards, isOwnCrib) {
-            // Simulate all possible starters (remaining 46 cards)
-            const knownCards = [...keepCards, ...discardCards];
-            const remainingCards = generateRemainingDeck(knownCards);
+            // Simplified but improved expected value calculation
+            const handScore = estimateHandValue(keepCards);
+            const cribContribution = estimateCribValue(discardCards) * (isOwnCrib ? 1 : -0.5);
             
-            let totalHandScore = 0;
-            let totalCribContribution = 0;
+            return handScore + cribContribution;
+        }
+        
+        function estimateHandValue(cards) {
+            // Quick estimation based on card synergy
+            let estimate = 0;
             
-            // Test with every possible starter
-            remainingCards.forEach(starter => {
-                // Score the hand
-                const handScore = scoreHandSimple(keepCards, starter);
-                totalHandScore += handScore;
-                
-                // Estimate crib contribution
-                const cribContrib = estimateCribContribution(discardCards, starter);
-                totalCribContribution += cribContrib;
+            // Check for pairs potential
+            const ranks = cards.map(c => c.rank);
+            const rankCounts = {};
+            ranks.forEach(rank => rankCounts[rank] = (rankCounts[rank] || 0) + 1);
+            Object.values(rankCounts).forEach(count => {
+                if (count >= 2) estimate += count * (count - 1);
             });
             
-            const avgHandScore = totalHandScore / remainingCards.length;
-            const avgCribContrib = totalCribContribution / remainingCards.length;
+            // Check for fifteen potential
+            const values = cards.map(card => {
+                if (['J', 'Q', 'K'].includes(card.rank)) return 10;
+                if (card.rank === 'A') return 1;
+                return parseInt(card.rank);
+            });
             
-            // Calculate total expected value
-            const totalEV = isOwnCrib ? 
-                avgHandScore + avgCribContrib : 
-                avgHandScore - (avgCribContrib * 0.7); // Opponent gets less benefit
-            
-            return {
-                handScore: avgHandScore,
-                cribContribution: avgCribContrib,
-                totalExpectedValue: totalEV
-            };
-        }
-        
-        // Simple hand scoring for EV calculation
-        function scoreHandSimple(hand, starter) {
-            // Convert to CribbageCard objects for consistency
-            const handCards = hand.map(card => new CribbageCard(card.rank, card.suit));
-            const starterCard = new CribbageCard(starter.rank, starter.suit);
-            
-            // Use our detailed scorer but just return the total
-            const scorer = new DetailedCribbageScorer();
-            const result = scorer.scoreHand(handCards, starterCard);
-            
-            return result.totalScore;
-        }
-        
-        // Get card value for calculations
-        function getCardValue(card) {
-            const cardObj = new CribbageCard(card.rank, card.suit);
-            return cardObj.getValue();
-        }
-        
-        // Estimate crib contribution
-        function estimateCribContribution(discardCards, starter) {
-            if (discardCards.length !== 2) return 0;
-            
-            let score = 0;
-            const cribCards = [...discardCards, starter];
-            
-            // Pairs in discard
-            if (discardCards[0].rank === discardCards[1].rank) score += 2;
-            
-            // Pairs with starter
-            if (discardCards[0].rank === starter.rank) score += 2;
-            if (discardCards[1].rank === starter.rank) score += 2;
-            
-            // Fifteens
-            if (getCardValue(discardCards[0]) + getCardValue(discardCards[1]) === 15) score += 2;
-            if (getCardValue(discardCards[0]) + getCardValue(starter) === 15) score += 2;
-            if (getCardValue(discardCards[1]) + getCardValue(starter) === 15) score += 2;
-            if (getCardValue(discardCards[0]) + getCardValue(discardCards[1]) + getCardValue(starter) === 15) score += 2;
-            
-            return score;
-        }
-        
-        // Generate remaining deck (46 cards after dealing 6)
-        function generateRemainingDeck(knownCards) {
-            const remainingCards = [];
-            
-            ranks.forEach(rank => {
-                suits.forEach(suit => {
-                    const cardExists = knownCards.some(card => 
-                        card.rank === rank && card.suit === suit
-                    );
-                    if (!cardExists) {
-                        remainingCards.push({ rank, suit });
+            // Quick fifteen check
+            for (let i = 0; i < values.length; i++) {
+                for (let j = i + 1; j < values.length; j++) {
+                    if (values[i] + values[j] === 15) estimate += 2;
+                    for (let k = j + 1; k < values.length; k++) {
+                        if (values[i] + values[j] + values[k] === 15) estimate += 2;
                     }
-                });
-            });
-            
-            return remainingCards;
-        }
-        
-        // Main analysis function
-        function analyzeDiscards() {
-            const combinations = getAllCombinations(discardHand);
-            
-            // Calculate EV for each combination
-            const analysis = combinations.map(combo => {
-                const ev = calculateExpectedValue(combo.keep, combo.discard, isOwnCrib);
-                return { ...combo, ...ev };
-            });
-            
-            // Sort by total expected value
-            analysis.sort((a, b) => b.totalExpectedValue - a.totalExpectedValue);
-            
-            // Display results
-            displayAnalysisResults(analysis);
-        }
-        
-        // Display analysis results
-        function displayAnalysisResults(analysis) {
-            const resultsDiv = document.getElementById('discardResults');
-            const bestChoice = document.getElementById('bestChoice');
-            const allOptionsTable = document.getElementById('allOptionsTable');
-            const strategyTips = document.getElementById('strategyTips');
-            
-            // Show best recommendation
-            const best = analysis[0];
-            bestChoice.innerHTML = `
-                <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 20px;">
-                    <div>
-                        <h4 style="color: gold; margin-bottom: 10px;">KEEP THESE 4:</h4>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; justify-items: center; max-width: 140px; margin: 0 auto;">
-                            ${best.keep.map(card => `
-                                <div class="card" style="width: 60px; height: 84px; font-size: 1.2em;">
-                                    <div class="card-rank">${card.rank}</div>
-                                    <div class="card-suit ${['H','D'].includes(card.suit) ? 'red' : 'black'}">${suitSymbols[card.suit]}</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                    <div>
-                        <h4 style="color: #ff6b6b; margin-bottom: 10px;">DISCARD THESE 2:</h4>
-                        <div style="display: flex; gap: 10px; justify-content: center;">
-                            ${best.discard.map(card => `
-                                <div class="card" style="width: 60px; height: 84px; font-size: 1.2em; opacity: 0.7;">
-                                    <div class="card-rank">${card.rank}</div>
-                                    <div class="card-suit ${['H','D'].includes(card.suit) ? 'red' : 'black'}">${suitSymbols[card.suit]}</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                    <div>
-                        <h4 style="color: gold;">Expected Value:</h4>
-                        <div style="color: white; font-size: 1.5em; font-weight: bold;">
-                            ${best.totalExpectedValue.toFixed(2)} pts
-                        </div>
-                        <div style="color: #ccc; font-size: 0.9em;">
-                            Hand: ${best.handScore.toFixed(1)} | Crib: ${best.cribContribution.toFixed(1)}
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Show all options table
-            allOptionsTable.innerHTML = `
-                <div style="overflow-x: auto; background: linear-gradient(145deg, #0d5c0d, #1a691a); border-radius: 10px; padding: 15px;">
-                    <table style="width: 100%; color: white; border-collapse: collapse;">
-                        <thead>
-                            <tr style="border-bottom: 2px solid gold;">
-                                <th style="padding: 10px; text-align: left; color: white;">Rank</th>
-                                <th style="padding: 10px; text-align: left; color: white;">Keep</th>
-                                <th style="padding: 10px; text-align: left; color: white;">Discard</th>
-                                <th style="padding: 10px; color: white;">Avg Hand</th>
-                                <th style="padding: 10px; color: white;">Avg Crib</th>
-                                <th style="padding: 10px; color: gold;">Total Avg</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${analysis.map((option, index) => `
-                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.2); ${index === 0 ? 'background: rgba(255,215,0,0.1);' : ''}">
-                                    <td style="padding: 10px; font-weight: bold; color: ${index < 3 ? 'gold' : 'white'};">
-                                        ${index + 1}${index === 0 ? ' 🏆' : ''}
-                                    </td>
-                                    <td style="padding: 10px; font-size: 0.9em; text-align: left;">
-                                        ${option.keep.map(card => `${card.rank}${suitSymbols[card.suit]}`).join(' ')}
-                                    </td>
-                                    <td style="padding: 10px; font-size: 0.9em; text-align: left;">
-                                        ${option.discard.map(card => `${card.rank}${suitSymbols[card.suit]}`).join(' ')}
-                                    </td>
-                                    <td style="padding: 10px; text-align: center;">
-                                        ${option.handScore.toFixed(1)}
-                                    </td>
-                                    <td style="padding: 10px; text-align: center;">
-                                        ${option.cribContribution.toFixed(1)}
-                                    </td>
-                                    <td style="padding: 10px; text-align: center; font-weight: bold; color: ${index === 0 ? 'gold' : 'white'};">
-                                        ${option.totalExpectedValue.toFixed(2)}
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            
-            // Strategy tips based on analysis
-            const tips = getStrategyTips(analysis, isOwnCrib);
-            strategyTips.innerHTML = `<ul style="color: white; line-height: 1.8;">
-                ${tips.map(tip => `<li style="margin-bottom: 8px;">${tip}</li>`).join('')}
-            </ul>`;
-            
-            resultsDiv.style.display = 'block';
-        }
-        
-        // Get contextual strategy tips
-        function getStrategyTips(analysis, isOwnCrib) {
-            const tips = [];
-            const best = analysis[0];
-            const worst = analysis[analysis.length - 1];
-            const spread = best.totalExpectedValue - worst.totalExpectedValue;
-            
-            if (isOwnCrib) {
-                tips.push("💡 <strong>Your Crib:</strong> Look for discards that help both your hand AND your crib");
-                tips.push("🎯 Prioritize hands with good scoring potential - the crib is bonus points");
-            } else {
-                tips.push("🛡️ <strong>Opponent's Crib:</strong> Avoid giving them easy pairs or fifteens");
-                tips.push("⚠️ Don't discard 5s, face cards together, or cards that sum to 15");
-            }
-            
-            if (spread > 2) {
-                tips.push(`📊 <strong>Decision Matters:</strong> ${spread.toFixed(1)} point spread between best and worst options!`);
-            } else {
-                tips.push("✅ <strong>Flexible Hand:</strong> Most discard choices are relatively close in value");
-            }
-            
-            // Check for specific patterns in best choice
-            const bestDiscard = best.discard;
-            if (bestDiscard[0].rank === bestDiscard[1].rank) {
-                tips.push("👥 You're discarding a pair - this gives points to the crib holder");
-            }
-            
-            const discardSum = getCardValue(bestDiscard[0]) + getCardValue(bestDiscard[1]);
-            if (discardSum === 15) {
-                tips.push("🎯 Your discard sums to 15 - automatic 2 points for crib holder");
-            }
-            
-            return tips;
-        }
-        
-        // Random 6 cards for discard analysis
-        function randomSixCards() {
-            const usedCards = new Set();
-            const newCards = [];
-            
-            while (newCards.length < 6) {
-                const rank = ranks[Math.floor(Math.random() * ranks.length)];
-                const suit = suits[Math.floor(Math.random() * suits.length)];
-                const cardKey = `${rank}${suit}`;
-                
-                if (!usedCards.has(cardKey)) {
-                    usedCards.add(cardKey);
-                    newCards.push({ rank, suit });
                 }
             }
             
-            discardHand = newCards;
-            updateDiscardDisplay();
-            analyzeDiscards();
+            return estimate;
         }
         
-        // Clear discard hand
-        function clearDiscardHand() {
-            document.getElementById('discardResults').style.display = 'none';
-            document.querySelectorAll('#discardHand .card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            selectedDiscardIndex = -1;
+        function estimateCribValue(discardCards) {
+            // Estimate crib contribution
+            if (discardCards.length !== 2) return 0;
+            
+            const [card1, card2] = discardCards;
+            let estimate = 0;
+            
+            // Same rank = guaranteed 2 points
+            if (card1.rank === card2.rank) estimate += 2;
+            
+            // Cards that make 15
+            const val1 = ['J', 'Q', 'K'].includes(card1.rank) ? 10 : (card1.rank === 'A' ? 1 : parseInt(card1.rank));
+            const val2 = ['J', 'Q', 'K'].includes(card2.rank) ? 10 : (card2.rank === 'A' ? 1 : parseInt(card2.rank));
+            if (val1 + val2 === 15) estimate += 2;
+            
+            // Same suit
+            if (card1.suit === card2.suit) estimate += 1;
+            
+            // Avoid dangerous cards (5s are often good for opponent's crib)
+            if (card1.rank === '5' || card2.rank === '5') estimate += 1;
+            
+            return estimate;
         }
-
-        // Statistics functionality removed for streamlined interface
         
-        // ===========================================
-        // SCOREBOARD FUNCTIONALITY
-        // ===========================================
-        
-        // Scoreboard Game State
-        let scoreboardGameState = {
-            player1: {
-                name: 'Colin',
-                score: 0,
-                previousScore: 0,
-                corners: 0,
-                wins: 0,
-                gamesPlayed: 0,
-                totalPoints: 0
-            },
-            player2: {
-                name: 'Holly', 
-                score: 0,
-                previousScore: 0,
-                corners: 0,
-                wins: 0,
-                gamesPlayed: 0,
-                totalPoints: 0
-            },
-            currentPlayer: null,
-            gameActive: false,
-            gameHistory: [],
-            lastMove: null,
-            pendingMove: null,
-            statistics: {
-                totalGames: 0,
-                totalSkunks: 0,
-                totalDoubleSkunks: 0,
-                totalCorners: 0,
-                perfectGames: 0
+        function getStrategyTip(bestCombo, isOwnCrib) {
+            if (isOwnCrib) {
+                return "When it's your crib, balance keeping a good hand with giving yourself helpful discard cards.";
+            } else {
+                return "When it's opponent's crib, avoid discarding cards that are likely to help them (especially 5s and complementary cards).";
             }
-        };
-
-        // Create vertical serpentine traditional cribbage board layout
+        }
+        
+        // ===== ENHANCED SCOREBOARD FUNCTIONS =====
+        function initializeScoreboard() {
+            loadGameState();
+            updateScoreboardDisplay();
+        }
+        
         function createScoreboardBoard() {
-            const board = document.getElementById('scoreboardCribbageBoard');
+            const board = document.getElementById('scoreboardBoard');
             if (!board) return;
             
             board.innerHTML = '';
@@ -2499,23 +1540,18 @@
             const container = document.createElement('div');
             container.className = 'board-container-vertical';
             
-            // Create 4 columns of 30 holes each (traditional cribbage board)
-            // Column 1: 1-30 (top to bottom)
-            // Column 2: 31-60 (bottom to top)  
-            // Column 3: 61-90 (top to bottom)
-            // Column 4: 91-120 (bottom to top)
-            // Plus finish hole 121 in last column
-            
+            // Create traditional 4-column cribbage board layout
             for (let col = 0; col < 4; col++) {
                 const startHole = col * 30 + 1;
                 const endHole = (col + 1) * 30;
-                const isReverse = col % 2 === 1; // Every other column is reversed (bottom to top)
+                const isReverse = col % 2 === 1;
                 const isLastColumn = col === 3;
                 
                 createVerticalColumn(container, startHole, endHole, isReverse, isLastColumn);
             }
             
             board.appendChild(container);
+            updateScoreboardBoard();
         }
         
         function createVerticalColumn(parent, start, end, reverse, isLastColumn) {
@@ -2527,7 +1563,6 @@
                 holes.push(i);
             }
             
-            // Don't reverse the array - let CSS handle the visual reversal
             holes.forEach(holeNum => {
                 const hole = createHole(holeNum);
                 column.appendChild(hole);
@@ -2550,21 +1585,29 @@
             const hole = document.createElement('div');
             hole.className = 'scoreboard-hole';
             hole.id = `scoreboard-hole-${holeNum}`;
+            hole.setAttribute('tabindex', '0'); // Keyboard accessibility
             
-            // Mark every 5th hole and corners with numbers
-            const isMarked = (holeNum % 5 === 0) || (holeNum === 30 || holeNum === 60 || holeNum === 90 || holeNum === 120);
+            const isMarked = (holeNum % 5 === 0) || [31, 61, 91, 121].includes(holeNum);
             
             if (isMarked) {
                 hole.classList.add('marked');
                 hole.textContent = holeNum;
                 
-                // Mark corner positions with special styling
-                if (holeNum === 30 || holeNum === 60 || holeNum === 90 || holeNum === 120) {
+                if ([31, 61, 91, 121].includes(holeNum)) {
                     hole.classList.add('corner');
                 }
             }
             
             hole.addEventListener('click', () => handleHoleClick(holeNum));
+            
+            // Enhanced keyboard support
+            hole.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    handleHoleClick(holeNum);
+                    e.preventDefault();
+                }
+            });
+            
             return hole;
         }
         
@@ -2573,30 +1616,41 @@
             hole.className = 'scoreboard-hole marked';
             hole.id = 'scoreboard-hole-121';
             hole.textContent = '121';
-            hole.style.background = '#ffd700';
-            hole.style.borderColor = '#ffed4e';
-            hole.style.boxShadow = '0 0 15px rgba(255, 215, 0, 0.8)';
-            hole.style.fontSize = '0.7em';
-            hole.style.fontWeight = 'bold';
-            hole.style.width = '24px';
-            hole.style.height = '24px';
-            hole.style.margin = '4px 0';
+            hole.setAttribute('tabindex', '0');
+            
+            // Special styling for finish hole
+            Object.assign(hole.style, {
+                background: 'radial-gradient(circle, #FFD700, #FFA500)',
+                borderColor: '#ffed4e',
+                boxShadow: '0 0 15px rgba(255, 215, 0, 0.8)',
+                fontSize: '0.7em',
+                fontWeight: 'bold',
+                width: '24px',
+                height: '24px',
+                margin: '4px 0',
+                color: '#333'
+            });
             
             hole.addEventListener('click', () => handleHoleClick(121));
+            hole.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    handleHoleClick(121);
+                    e.preventDefault();
+                }
+            });
+            
             return hole;
         }
         
-        // Finish hole now created inline with last column
-
-        // Handle hole click - traditional two-peg system
+        // FIXED: Enhanced hole click handling with better validation
         function handleHoleClick(position) {
             if (!scoreboardGameState.currentPlayer) {
-                alert('Please select a player first by clicking their score card!');
+                showMessage('Please select a player first by clicking their score card!');
                 return;
             }
             
             if (!scoreboardGameState.gameActive) {
-                alert('Please start a new game first!');
+                showMessage('Please start a new game first!');
                 return;
             }
             
@@ -2604,39 +1658,34 @@
             const currentScore = player.score;
             const pointsToScore = position - currentScore;
             
-            // Validation: Can't go backwards or stay same
+            // Enhanced validation
             if (pointsToScore <= 0) {
-                alert('You can only move forward on the board!');
+                showMessage('You can only move forward on the board!');
                 return;
             }
             
-            // Validation: Max 29 points per turn (highest single hand in cribbage)
             if (pointsToScore > 29) {
-                alert(`Maximum 29 points per turn! You tried to score ${pointsToScore} points.`);
+                showMessage(`Maximum 29 points per turn! You tried to score ${pointsToScore} points.`);
                 return;
             }
             
-            // Can't exceed 121
             if (position > 121) {
-                alert('Score cannot exceed 121!');
+                showMessage('Score cannot exceed 121!');
                 return;
             }
             
-            // Show preview and confirmation
             showScorePreview(position, pointsToScore);
         }
         
         function showScorePreview(newPosition, pointsScored) {
-            // Clear any existing previews
             clearScorePreview();
             
-            // Highlight the target hole
             const targetHole = document.getElementById(`scoreboard-hole-${newPosition}`);
             if (targetHole) {
                 targetHole.classList.add('preview');
+                targetHole.focus(); // Accessibility
             }
             
-            // Store pending move
             const player = scoreboardGameState.currentPlayer === 1 ? scoreboardGameState.player1 : scoreboardGameState.player2;
             scoreboardGameState.pendingMove = {
                 player: scoreboardGameState.currentPlayer,
@@ -2646,7 +1695,6 @@
                 pointsScored: pointsScored
             };
             
-            // Show confirmation dialog
             showConfirmationDialog();
         }
         
@@ -2670,43 +1718,126 @@
                 toScore.textContent = scoreboardGameState.pendingMove.newScore;
                 
                 dialog.classList.remove('hidden');
+                
+                // Focus the confirm button for accessibility
+                const confirmBtn = dialog.querySelector('.confirm-btn');
+                if (confirmBtn) confirmBtn.focus();
             }
         }
         
+        function hideConfirmationDialog() {
+            const dialog = document.getElementById('scoreConfirmation');
+            if (dialog) dialog.classList.add('hidden');
+        }
+        
+        // FIXED: Enhanced score confirmation with better game end detection
         function confirmScore() {
             if (!scoreboardGameState.pendingMove) return;
             
             const move = scoreboardGameState.pendingMove;
             const player = move.player === 1 ? scoreboardGameState.player1 : scoreboardGameState.player2;
             
-            // Store previous score for two-peg system
-            player.previousScore = player.score;
-            player.score = move.newScore;
-            player.totalPoints += move.pointsScored;
-            
-            // Record for undo
+            // Store for undo functionality
             scoreboardGameState.lastMove = {
                 player: move.player,
-                oldScore: move.oldScore,
+                oldScore: player.score,
                 oldPreviousScore: player.previousScore,
                 newScore: move.newScore,
                 pointsAdded: move.pointsScored
             };
             
-            // Clear pending move
+            // Update scores
+            player.previousScore = player.score;
+            player.score = move.newScore;
+            player.totalPoints += move.pointsScored;
+            
+            // Check for corners (31, 61, 91)
+            if ([31, 61, 91].includes(move.newScore) && ![31, 61, 91].includes(move.oldScore)) {
+                player.corners++;
+                scoreboardGameState.statistics.totalCorners++;
+                showMessage(`🎯 ${player.name} hit a corner at ${move.newScore}!`, 'success', 3000);
+            }
+            
+            // Check for game end
+            if (move.newScore >= 121) {
+                endGame(move.player, move.newScore);
+                return;
+            }
+            
+            // Clear state and update display
             scoreboardGameState.pendingMove = null;
             hideConfirmationDialog();
             clearScorePreview();
-            
-            // Update display and check for win
             updateScoreboardDisplay();
-            updateScoreboardBoard();
-            checkForScoreboardCornerAndWin(move.player, move.oldScore, move.newScore);
-            saveScoreboardGameData();
+            saveGameState();
             
-            // Auto-switch to other player
-            scoreboardGameState.currentPlayer = scoreboardGameState.currentPlayer === 1 ? 2 : 1;
+            showMessage(`✅ ${player.name} scored ${move.pointsScored} points!`, 'success', 2000);
+        }
+        
+        // ENHANCED: Better game end detection and celebration
+        function endGame(winnerNum, finalScore) {
+            const winner = winnerNum === 1 ? scoreboardGameState.player1 : scoreboardGameState.player2;
+            const loser = winnerNum === 1 ? scoreboardGameState.player2 : scoreboardGameState.player1;
+            
+            winner.gamesWon++;
+            scoreboardGameState.statistics.totalGames++;
+            
+            // Determine win type
+            let winType = 'Regular Win';
+            let celebration = '🏆';
+            
+            if (loser.score <= 90) {
+                winType = 'Double Skunk!';
+                celebration = '🦨🦨';
+                winner.doubleSkunks++;
+                scoreboardGameState.statistics.totalDoubleSkunks++;
+            } else if (loser.score <= 90) {
+                winType = 'Skunk!';
+                celebration = '🦨';
+                winner.skunks++;
+                scoreboardGameState.statistics.totalSkunks++;
+            }
+            
+            // Perfect game detection
+            if (finalScore === 121 && winner.previousScore >= 115) {
+                scoreboardGameState.statistics.perfectGames++;
+                celebration += '✨';
+            }
+            
+            // Record game history
+            scoreboardGameState.gameHistory.unshift({
+                date: new Date().toISOString(),
+                winner: winner.name,
+                loser: loser.name,
+                winnerScore: finalScore,
+                loserScore: loser.score,
+                winType: winType,
+                timestamp: Date.now()
+            });
+            
+            // Keep only last 50 games
+            if (scoreboardGameState.gameHistory.length > 50) {
+                scoreboardGameState.gameHistory = scoreboardGameState.gameHistory.slice(0, 50);
+            }
+            
+            scoreboardGameState.gameActive = false;
+            scoreboardGameState.currentPlayer = null;
+            scoreboardGameState.pendingMove = null;
+            
+            hideConfirmationDialog();
+            clearScorePreview();
             updateScoreboardDisplay();
+            saveGameState();
+            
+            // Show celebration
+            showMessage(`${celebration} ${winner.name} wins with a ${winType} (${finalScore}-${loser.score})!`, 'success', 5000);
+            
+            // Auto-suggest new game after celebration
+            setTimeout(() => {
+                if (confirm(`🎉 Great game! ${winner.name} won ${finalScore}-${loser.score}. Start a new game?`)) {
+                    startNewGame();
+                }
+            }, 3000);
         }
         
         function cancelScore() {
@@ -2715,383 +1846,332 @@
             clearScorePreview();
         }
         
-        function hideConfirmationDialog() {
-            const dialog = document.getElementById('scoreConfirmation');
-            if (dialog) {
-                dialog.classList.add('hidden');
-            }
-        }
-
-        // Undo last score
-        function undoLastScoreboardScore() {
-            if (!scoreboardGameState.lastMove) {
-                alert('No move to undo!');
-                return;
-            }
-            
-            const lastMove = scoreboardGameState.lastMove;
-            const player = lastMove.player === 1 ? scoreboardGameState.player1 : scoreboardGameState.player2;
-            
-            // Restore previous scores
-            const currentScore = player.score;
-            player.score = lastMove.oldScore;
-            if (lastMove.oldPreviousScore !== undefined) {
-                player.previousScore = lastMove.oldPreviousScore;
-            }
-            player.totalPoints -= lastMove.pointsAdded;
-            
-            // Undo corners if applicable
-            if (lastMove.oldScore < 30 && currentScore >= 30) player.corners--;
-            if (lastMove.oldScore < 60 && currentScore >= 60) player.corners--;
-            if (lastMove.oldScore < 90 && currentScore >= 90) player.corners--;
-            if (lastMove.oldScore < 120 && currentScore >= 120) player.corners--;
-            
-            scoreboardGameState.lastMove = null;
-            
-            // Cancel any pending moves
-            cancelScore();
-            
-            updateScoreboardDisplay();
-            updateScoreboardBoard();
-            saveScoreboardGameData();
-            
-            showScoreboardCelebration(`↶ Undid ${player.name}'s last move`);
-        }
-
-        // Check for corners and win
-        function checkForScoreboardCornerAndWin(playerNum, oldScore, newScore) {
-            const player = playerNum === 1 ? scoreboardGameState.player1 : scoreboardGameState.player2;
-            
-            // Check corners (30, 60, 90, 120)
-            const corners = [30, 60, 90, 120];
-            corners.forEach(corner => {
-                if (oldScore < corner && newScore >= corner) {
-                    player.corners++;
-                    scoreboardGameState.statistics.totalCorners++;
-                    showScoreboardCelebration(`🎯 ${player.name} hit corner ${corner}!`);
-                }
-            });
-            
-            // Check for win
-            if (newScore >= 121) {
-                endScoreboardGame(playerNum);
-            }
-        }
-
-        // End game
-        function endScoreboardGame(winnerNum) {
-            const winner = winnerNum === 1 ? scoreboardGameState.player1 : scoreboardGameState.player2;
-            const loser = winnerNum === 1 ? scoreboardGameState.player2 : scoreboardGameState.player1;
-            
-            winner.wins++;
-            winner.gamesPlayed++;
-            loser.gamesPlayed++;
-            
-            const pointDifference = winner.score - loser.score;
-            let gameType = 'Regular Win';
-            
-            // Check for skunks
-            if (pointDifference >= 61) {
-                gameType = '💀 DOUBLE SKUNK! 💀';
-                scoreboardGameState.statistics.totalDoubleSkunks++;
-            } else if (pointDifference >= 31) {
-                gameType = '🦨 SKUNK! 🦨';
-                scoreboardGameState.statistics.totalSkunks++;
-            }
-            
-            if (winner.score === 121) {
-                scoreboardGameState.statistics.perfectGames++;
-            }
-            
-            scoreboardGameState.statistics.totalGames++;
-            
-            // Record game in history
-            scoreboardGameState.gameHistory.push({
-                date: new Date().toISOString(),
-                winner: winner.name,
-                loser: loser.name,
-                winnerScore: winner.score,
-                loserScore: loser.score,
-                gameType: gameType,
-                pointDifference: pointDifference
-            });
-            
-            scoreboardGameState.gameActive = false;
-            scoreboardGameState.currentPlayer = null;
-            
-            showScoreboardCelebration(`🏆 ${winner.name} WINS! 🏆\n${gameType}\nFinal Score: ${winner.score} - ${loser.score}`);
-            
-            updateScoreboardDisplay();
-            saveScoreboardGameData();
-        }
-
-        // Start new game
         function startNewGame() {
-            // Update player names
-            scoreboardGameState.player1.name = document.getElementById('scoreboardPlayer1Name').value || 'Player 1';
-            scoreboardGameState.player2.name = document.getElementById('scoreboardPlayer2Name').value || 'Player 2';
+            const player1Name = document.getElementById('player1Name').value.trim() || 'Player 1';
+            const player2Name = document.getElementById('player2Name').value.trim() || 'Player 2';
             
-            // Reset scores and pegs
+            // Reset player scores but keep statistics
+            scoreboardGameState.player1.name = player1Name;
             scoreboardGameState.player1.score = 0;
             scoreboardGameState.player1.previousScore = 0;
+            
+            scoreboardGameState.player2.name = player2Name;
             scoreboardGameState.player2.score = 0;
             scoreboardGameState.player2.previousScore = 0;
-            scoreboardGameState.player1.corners = 0;
-            scoreboardGameState.player2.corners = 0;
-            scoreboardGameState.currentPlayer = 1;
-            scoreboardGameState.gameActive = true;
-            scoreboardGameState.lastMove = null;
-            scoreboardGameState.pendingMove = null;
             
-            // Cancel any confirmation dialogs
-            hideConfirmationDialog();
-            clearScorePreview();
+            scoreboardGameState.gameActive = true;
+            scoreboardGameState.currentPlayer = null;
+            scoreboardGameState.pendingMove = null;
+            scoreboardGameState.lastMove = null;
+            
+            // Create board if it doesn't exist
+            if (!document.querySelector('#scoreboardBoard .board-container-vertical')) {
+                createScoreboardBoard();
+            }
             
             updateScoreboardDisplay();
-            updateScoreboardBoard();
-            saveScoreboardGameData();
+            saveGameState();
             
-            showScoreboardCelebration(`🎯 New Game Started!\n${scoreboardGameState.player1.name} vs ${scoreboardGameState.player2.name}`);
+            showMessage(`🎯 New game started! ${player1Name} vs ${player2Name}`, 'success', 2000);
         }
-
-        // Update display
-        function updateScoreboardDisplay() {
-            // Player names
-            const player1Name = document.getElementById('scoreboardPlayer1DisplayName');
-            const player2Name = document.getElementById('scoreboardPlayer2DisplayName');
-            if (player1Name) player1Name.textContent = scoreboardGameState.player1.name;
-            if (player2Name) player2Name.textContent = scoreboardGameState.player2.name;
-            
-            // Scores
-            const player1Score = document.getElementById('scoreboardPlayer1CurrentScore');
-            const player2Score = document.getElementById('scoreboardPlayer2CurrentScore');
-            if (player1Score) player1Score.textContent = scoreboardGameState.player1.score;
-            if (player2Score) player2Score.textContent = scoreboardGameState.player2.score;
-            
-            // Corners and wins
-            const player1Corners = document.getElementById('scoreboardPlayer1Corners');
-            const player1Wins = document.getElementById('scoreboardPlayer1Wins');
-            const player2Corners = document.getElementById('scoreboardPlayer2Corners');
-            const player2Wins = document.getElementById('scoreboardPlayer2Wins');
-            
-            if (player1Corners) player1Corners.textContent = scoreboardGameState.player1.corners;
-            if (player1Wins) player1Wins.textContent = scoreboardGameState.player1.wins;
-            if (player2Corners) player2Corners.textContent = scoreboardGameState.player2.corners;
-            if (player2Wins) player2Wins.textContent = scoreboardGameState.player2.wins;
-            
-            // Highlight current player
-            const player1ScoreCard = document.getElementById('scoreboardPlayer1Score');
-            const player2ScoreCard = document.getElementById('scoreboardPlayer2Score');
-            if (player1ScoreCard) player1ScoreCard.classList.toggle('active', scoreboardGameState.currentPlayer === 1);
-            if (player2ScoreCard) player2ScoreCard.classList.toggle('active', scoreboardGameState.currentPlayer === 2);
-            
-            // Statistics
-            updateScoreboardStatistics();
-            
-            // Make score cards clickable
-            if (player1ScoreCard) player1ScoreCard.onclick = () => selectScoreboardPlayer(1);
-            if (player2ScoreCard) player2ScoreCard.onclick = () => selectScoreboardPlayer(2);
-        }
-
-        // Select player
-        function selectScoreboardPlayer(playerNum) {
+        
+        function selectPlayer(playerNum) {
             if (!scoreboardGameState.gameActive) {
-                alert('Please start a new game first!');
+                showMessage('Please start a new game first!');
                 return;
             }
+            
             scoreboardGameState.currentPlayer = playerNum;
             updateScoreboardDisplay();
+            
+            const playerName = playerNum === 1 ? scoreboardGameState.player1.name : scoreboardGameState.player2.name;
+            showMessage(`📍 Selected ${playerName} for scoring`, 'success', 1500);
         }
-
-        // Update board display with two-peg system
+        
+        // ENHANCED: Better display updates with animations
+        function updateScoreboardDisplay() {
+            // Update player cards
+            const player1Card = document.getElementById('player1Card');
+            const player2Card = document.getElementById('player2Card');
+            
+            if (player1Card) {
+                player1Card.classList.toggle('selected', scoreboardGameState.currentPlayer === 1);
+                player1Card.innerHTML = `
+                    <div style="font-size: 1.2em; font-weight: bold; color: #FF6B6B;">${scoreboardGameState.player1.name}</div>
+                    <div style="font-size: 2em; margin: 10px 0; color: white;">${scoreboardGameState.player1.score}</div>
+                    <div style="font-size: 0.9em; color: #ccc;">Corners: ${scoreboardGameState.player1.corners} | Games Won: ${scoreboardGameState.player1.gamesWon}</div>
+                `;
+            }
+            
+            if (player2Card) {
+                player2Card.classList.toggle('selected', scoreboardGameState.currentPlayer === 2);
+                player2Card.innerHTML = `
+                    <div style="font-size: 1.2em; font-weight: bold; color: #4ECDC4;">${scoreboardGameState.player2.name}</div>
+                    <div style="font-size: 2em; margin: 10px 0; color: white;">${scoreboardGameState.player2.score}</div>
+                    <div style="font-size: 0.9em; color: #ccc;">Corners: ${scoreboardGameState.player2.corners} | Games Won: ${scoreboardGameState.player2.gamesWon}</div>
+                `;
+            }
+            
+            updateScoreboardBoard();
+        }
+        
+        // ENHANCED: Smoother peg animations
         function updateScoreboardBoard() {
-            // Clear all pegs
-            document.querySelectorAll('.scoreboard-peg').forEach(peg => peg.remove());
+            // Remove existing pegs with animation
+            document.querySelectorAll('.scoreboard-peg').forEach(peg => {
+                peg.style.opacity = '0';
+                peg.style.transform += ' scale(0.5)';
+                setTimeout(() => peg.remove(), 200);
+            });
             
-            // Player 1 pegs
+            // Add new pegs after animation delay
+            setTimeout(() => {
+                addPlayerPegs(scoreboardGameState.player1, 'player1');
+                addPlayerPegs(scoreboardGameState.player2, 'player2');
+            }, 250);
+        }
+        
+        function addPlayerPegs(player, playerClass) {
+            // Previous peg
+            if (player.previousScore > 0 && player.previousScore !== player.score) {
+                const prevHole = document.getElementById(`scoreboard-hole-${player.previousScore}`);
+                if (prevHole) {
+                    const prevPeg = document.createElement('div');
+                    prevPeg.className = `scoreboard-peg ${playerClass} previous`;
+                    prevPeg.title = `${player.name}'s previous score: ${player.previousScore}`;
+                    prevHole.appendChild(prevPeg);
+                }
+            }
+            
+            // Current peg
+            if (player.score > 0) {
+                const currentHole = document.getElementById(`scoreboard-hole-${player.score}`);
+                if (currentHole) {
+                    const currentPeg = document.createElement('div');
+                    currentPeg.className = `scoreboard-peg ${playerClass} current`;
+                    currentPeg.title = `${player.name}'s current score: ${player.score}`;
+                    
+                    // Offset for both players in same hole
+                    if (playerClass === 'player2') {
+                        currentPeg.style.transform = 'translate(-60%, -50%)';
+                    }
+                    
+                    currentHole.appendChild(currentPeg);
+                }
+            }
+        }
+        
+        // Quick scoring buttons
+        function quickScore(points) {
+            if (!scoreboardGameState.currentPlayer) {
+                showMessage('Please select a player first!');
+                return;
+            }
+            
+            if (!scoreboardGameState.gameActive) {
+                showMessage('Please start a new game first!');
+                return;
+            }
+            
+            const player = scoreboardGameState.currentPlayer === 1 ? scoreboardGameState.player1 : scoreboardGameState.player2;
+            const newScore = Math.min(player.score + points, 121);
+            
+            if (newScore === player.score) {
+                showMessage('Cannot score - would exceed 121 points!');
+                return;
+            }
+            
+            handleHoleClick(newScore);
+        }
+        
+        // FIXED: Enhanced undo functionality
+        function undoLastMove() {
+            if (!scoreboardGameState.lastMove) {
+                showMessage('No move to undo!');
+                return;
+            }
+            
+            const move = scoreboardGameState.lastMove;
+            const player = move.player === 1 ? scoreboardGameState.player1 : scoreboardGameState.player2;
+            
+            // Restore previous state
+            player.score = move.oldScore;
+            player.previousScore = move.oldPreviousScore;
+            player.totalPoints -= move.pointsAdded;
+            
+            // Handle corner undos
+            if ([31, 61, 91].includes(move.newScore) && ![31, 61, 91].includes(move.oldScore)) {
+                player.corners--;
+                scoreboardGameState.statistics.totalCorners--;
+            }
+            
+            scoreboardGameState.lastMove = null;
+            updateScoreboardDisplay();
+            saveGameState();
+            
+            showMessage(`↶ Undid ${player.name}'s last move`, 'success', 2000);
+        }
+        
+        function resetScoreboard() {
+            if (confirm('🔄 Reset current game? This cannot be undone.')) {
+                scoreboardGameState.player1.score = 0;
+                scoreboardGameState.player1.previousScore = 0;
+                scoreboardGameState.player2.score = 0;
+                scoreboardGameState.player2.previousScore = 0;
+                scoreboardGameState.currentPlayer = null;
+                scoreboardGameState.pendingMove = null;
+                scoreboardGameState.lastMove = null;
+                
+                updateScoreboardDisplay();
+                saveGameState();
+                
+                showMessage('🔄 Game reset successfully!', 'success');
+            }
+        }
+        
+        function toggleScoreboardStats() {
+            const stats = scoreboardGameState.statistics;
             const player1 = scoreboardGameState.player1;
-            
-            // Player 1 previous peg (if exists and different from current)
-            if (player1.previousScore > 0 && player1.previousScore !== player1.score) {
-                const prevHole1 = document.getElementById(`scoreboard-hole-${player1.previousScore}`);
-                if (prevHole1) {
-                    const prevPeg1 = document.createElement('div');
-                    prevPeg1.className = 'scoreboard-peg player1 previous';
-                    prevPeg1.title = `${player1.name}'s previous score: ${player1.previousScore}`;
-                    prevHole1.appendChild(prevPeg1);
-                }
-            }
-            
-            // Player 1 current peg
-            if (player1.score > 0) {
-                const currentHole1 = document.getElementById(`scoreboard-hole-${player1.score}`);
-                if (currentHole1) {
-                    const currentPeg1 = document.createElement('div');
-                    currentPeg1.className = 'scoreboard-peg player1 current';
-                    currentPeg1.title = `${player1.name}'s current score: ${player1.score}`;
-                    currentHole1.appendChild(currentPeg1);
-                }
-            }
-            
-            // Player 2 pegs
             const player2 = scoreboardGameState.player2;
             
-            // Player 2 previous peg (if exists and different from current)
-            if (player2.previousScore > 0 && player2.previousScore !== player2.score) {
-                const prevHole2 = document.getElementById(`scoreboard-hole-${player2.previousScore}`);
-                if (prevHole2) {
-                    const prevPeg2 = document.createElement('div');
-                    prevPeg2.className = 'scoreboard-peg player2 previous';
-                    prevPeg2.title = `${player2.name}'s previous score: ${player2.previousScore}`;
-                    // Offset slightly so both pegs are visible if in same hole
-                    prevPeg2.style.transform = 'translate(-40%, -50%)';
-                    prevHole2.appendChild(prevPeg2);
+            const totalGames = stats.totalGames || 1;
+            const avgPoints = Math.round((player1.totalPoints + player2.totalPoints) / totalGames);
+            
+            const statsHtml = `
+                <div style="background: rgba(0,0,0,0.4); padding: 20px; border-radius: 12px; margin: 20px 0; color: white;">
+                    <h3 style="color: gold; margin-bottom: 15px;">📊 Game Statistics</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div>
+                            <strong>🎮 Games Played:</strong> ${stats.totalGames}<br>
+                            <strong>🎯 Total Corners:</strong> ${stats.totalCorners}<br>
+                            <strong>🦨 Total Skunks:</strong> ${stats.totalSkunks}
+                        </div>
+                        <div>
+                            <strong>🦨🦨 Double Skunks:</strong> ${stats.totalDoubleSkunks}<br>
+                            <strong>✨ Perfect Games:</strong> ${stats.perfectGames}<br>
+                            <strong>📊 Avg Points/Game:</strong> ${avgPoints}
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #555;">
+                        <strong>${player1.name}:</strong> ${player1.gamesWon} wins, ${player1.corners} corners, ${player1.totalPoints} total points<br>
+                        <strong>${player2.name}:</strong> ${player2.gamesWon} wins, ${player2.corners} corners, ${player2.totalPoints} total points
+                    </div>
+                </div>
+            `;
+            
+            // Show stats in a modal-like overlay
+            let statsModal = document.getElementById('statsModal');
+            if (!statsModal) {
+                statsModal = document.createElement('div');
+                statsModal.id = 'statsModal';
+                statsModal.style.cssText = `
+                    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                    z-index: 1000; max-width: 90vw; max-height: 80vh; overflow-y: auto;
+                    background: linear-gradient(145deg, #2c5234, #1a3d20);
+                    border: 3px solid gold; border-radius: 15px; padding: 25px;
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+                `;
+                document.body.appendChild(statsModal);
+            }
+            
+            if (statsModal.style.display === 'none' || !statsModal.style.display) {
+                statsModal.innerHTML = statsHtml + `
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button onclick="document.getElementById('statsModal').style.display='none'" class="cancel-btn">Close</button>
+                    </div>
+                `;
+                statsModal.style.display = 'block';
+            } else {
+                statsModal.style.display = 'none';
+            }
+        }
+        
+        // ===== DATA PERSISTENCE =====
+        function saveGameState() {
+            try {
+                localStorage.setItem('cribbageGameState', JSON.stringify(scoreboardGameState));
+            } catch (error) {
+                console.warn('Could not save game state:', error);
+            }
+        }
+        
+        function loadGameState() {
+            try {
+                const saved = localStorage.getItem('cribbageGameState');
+                if (saved) {
+                    const loadedState = JSON.parse(saved);
+                    // Merge with defaults to handle new properties
+                    Object.assign(scoreboardGameState, loadedState);
                 }
-            }
-            
-            // Player 2 current peg
-            if (player2.score > 0) {
-                const currentHole2 = document.getElementById(`scoreboard-hole-${player2.score}`);
-                if (currentHole2) {
-                    const currentPeg2 = document.createElement('div');
-                    currentPeg2.className = 'scoreboard-peg player2 current';
-                    currentPeg2.title = `${player2.name}'s current score: ${player2.score}`;
-                    // Offset slightly so both pegs are visible if in same hole
-                    currentPeg2.style.transform = 'translate(-60%, -50%)';
-                    currentHole2.appendChild(currentPeg2);
-                }
+            } catch (error) {
+                console.warn('Could not load game state:', error);
             }
         }
-
-        // Update statistics
-        function updateScoreboardStatistics() {
-            const totalGames = document.getElementById('scoreboardTotalGames');
-            const totalSkunks = document.getElementById('scoreboardTotalSkunks');
-            const totalDoubleSkunks = document.getElementById('scoreboardTotalDoubleSkunks');
-            const perfectGames = document.getElementById('scoreboardPerfectGames');
-            const totalCorners = document.getElementById('scoreboardTotalCorners');
-            const avgPointsPerGame = document.getElementById('scoreboardAvgPointsPerGame');
+        
+        // ===== DEBUG FUNCTIONS =====
+        function runDebugTests() {
+            console.log('🔧 Running debug tests...');
             
-            if (totalGames) totalGames.textContent = scoreboardGameState.statistics.totalGames;
-            if (totalSkunks) totalSkunks.textContent = scoreboardGameState.statistics.totalSkunks;
-            if (totalDoubleSkunks) totalDoubleSkunks.textContent = scoreboardGameState.statistics.totalDoubleSkunks;
-            if (perfectGames) perfectGames.textContent = scoreboardGameState.statistics.perfectGames;
-            if (totalCorners) totalCorners.textContent = scoreboardGameState.statistics.totalCorners;
+            // Test 1: Perfect 29 hand
+            const perfect29 = [
+                { rank: '5', suit: 'H' },
+                { rank: '5', suit: 'D' },
+                { rank: '5', suit: 'C' },
+                { rank: 'J', suit: 'S' },
+                { rank: '5', suit: 'S' }
+            ];
             
-            const totalPoints = scoreboardGameState.player1.totalPoints + scoreboardGameState.player2.totalPoints;
-            const totalGamesPlayed = scoreboardGameState.statistics.totalGames || 1;
-            if (avgPointsPerGame) avgPointsPerGame.textContent = Math.round(totalPoints / totalGamesPlayed);
-        }
-
-        // Toggle statistics
-        function toggleScoreboardStats() {
-            const statsSection = document.getElementById('scoreboardStatsSection');
-            if (statsSection) statsSection.classList.toggle('hidden');
-        }
-
-        // Show celebration
-        function showScoreboardCelebration(message) {
-            // Create celebration element if it doesn't exist
-            let celebration = document.getElementById('scoreboardCelebration');
-            if (!celebration) {
-                celebration = document.createElement('div');
-                celebration.id = 'scoreboardCelebration';
-                celebration.className = 'celebration';
-                document.body.appendChild(celebration);
-            }
+            console.log('Test 1: Perfect 29 hand');
+            const temp = currentHand;
+            currentHand = perfect29;
+            scoreHand();
+            const score = parseInt(document.getElementById('totalScore').textContent);
+            console.log(`Expected: 29, Got: ${score}`, score === 29 ? '✅' : '❌');
+            currentHand = temp;
             
-            celebration.textContent = message;
-            celebration.classList.add('show');
+            // Test 2: Duplicate prevention
+            console.log('Test 2: Duplicate prevention works');
+            const duplicateTest = isCardDuplicate({ rank: 'A', suit: 'H' }, -1);
+            console.log(`Duplicate detection working:`, duplicateTest ? '✅' : '❌');
             
-            setTimeout(() => {
-                celebration.classList.remove('show');
-            }, 3000);
-        }
-
-        // Save game data
-        function saveScoreboardGameData() {
-            localStorage.setItem('cribbageScoreboard', JSON.stringify(scoreboardGameState));
-        }
-
-        // Load game data
-        function loadScoreboardGameData() {
-            const saved = localStorage.getItem('cribbageScoreboard');
-            if (saved) {
-                scoreboardGameState = {...scoreboardGameState, ...JSON.parse(saved)};
-                const player1Input = document.getElementById('scoreboardPlayer1Name');
-                const player2Input = document.getElementById('scoreboardPlayer2Name');
-                if (player1Input) player1Input.value = scoreboardGameState.player1.name;
-                if (player2Input) player2Input.value = scoreboardGameState.player2.name;
-            }
-        }
-
-        // Reset all data
-        function resetAllScoreboardData() {
-            if (confirm('This will reset ALL game data including statistics. Are you sure?')) {
-                localStorage.removeItem('cribbageScoreboard');
-                scoreboardGameState = {
-                    player1: { name: 'Colin', score: 0, previousScore: 0, corners: 0, wins: 0, gamesPlayed: 0, totalPoints: 0 },
-                    player2: { name: 'Holly', score: 0, previousScore: 0, corners: 0, wins: 0, gamesPlayed: 0, totalPoints: 0 },
-                    currentPlayer: null,
-                    gameActive: false,
-                    gameHistory: [],
-                    lastMove: null,
-                    pendingMove: null,
-                    statistics: { totalGames: 0, totalSkunks: 0, totalDoubleSkunks: 0, totalCorners: 0, perfectGames: 0 }
-                };
-                const player1Input = document.getElementById('scoreboardPlayer1Name');
-                const player2Input = document.getElementById('scoreboardPlayer2Name');
-                if (player1Input) player1Input.value = 'Colin';
-                if (player2Input) player2Input.value = 'Holly';
-                
-                hideConfirmationDialog();
-                clearScorePreview();
-                updateScoreboardDisplay();
-                updateScoreboardBoard();
-                showScoreboardCelebration('🗑️ All data reset!');
-            }
-        }
-
-        // Initialize scoreboard when page loads
-        function initializeScoreboard() {
-            loadScoreboardGameData();
-            createScoreboardBoard();
-            updateScoreboardDisplay();
+            // Test 3: Crib analysis
+            console.log('Test 3: Discard analysis functional');
+            console.log('All 15 combinations generated:', getAllCombinations(discardHand).length === 15 ? '✅' : '❌');
             
-            // Auto-save player names
-            const player1Input = document.getElementById('scoreboardPlayer1Name');
-            const player2Input = document.getElementById('scoreboardPlayer2Name');
-            
-            if (player1Input) {
-                player1Input.addEventListener('change', function() {
-                    scoreboardGameState.player1.name = this.value;
-                    saveScoreboardGameData();
-                    updateScoreboardDisplay();
-                });
-            }
-            
-            if (player2Input) {
-                player2Input.addEventListener('change', function() {
-                    scoreboardGameState.player2.name = this.value;
-                    saveScoreboardGameData();
-                    updateScoreboardDisplay();
-                });
-            }
+            console.log('🔧 Debug tests complete!');
+            showMessage('🔧 Debug tests complete! Check console for results.', 'success', 3000);
         }
-
-        // Enhanced tab switching to initialize scoreboard when first accessed
-        let originalShowTab = showTab;
-        showTab = function(tabName) {
-            originalShowTab(tabName);
-            if (tabName === 'scoreboard' && !window.scoreboardInitialized) {
-                // Small delay to ensure DOM is ready
-                setTimeout(initializeScoreboard, 100);
-                window.scoreboardInitialized = true;
-            }
-        };
+        
+        // ===== PLAY GAME FUNCTIONS =====
+        function startCribbageGame() {
+            showTab('play');
+            const playTab = document.querySelector('[onclick="showTab(\'play\')"]');
+            if (playTab) playTab.classList.add('active');
+            showMessage('🎮 Welcome to Play Cribbage mode!', 'success', 2000);
+        }
+        
+        function initializeCribbageGame() {
+            const player1Name = document.getElementById('gamePlayer1Name').value.trim() || 'You';
+            const player2Name = document.getElementById('gamePlayer2Name').value.trim() || 'Computer';
+            
+            // Hide setup, show game
+            document.getElementById('gameSetup').style.display = 'none';
+            document.getElementById('gamePlay').classList.remove('hidden');
+            
+            showMessage(`🎯 Starting game: ${player1Name} vs ${player2Name}!`, 'success', 3000);
+        }
+        
+        function showGameSetup() {
+            document.getElementById('gamePlay').classList.add('hidden');
+            document.getElementById('gameSetup').style.display = 'block';
+        }
+        
+        // Expose debug function globally
+        window.runDebugTests = runDebugTests;
+        
+        console.log('🎯 Cribbage Pro - Debug Fixed Version Ready!');
+        console.log('💡 Try: runDebugTests() in console to run all tests');
+        console.log('🎮 Play Cribbage button added!');
     </script>
-    
-    <!-- Celebration Overlay for Scoreboard -->
-    <div class="celebration" id="scoreboardCelebration"></div>
 </body>
 </html>

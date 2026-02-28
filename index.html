@@ -155,9 +155,10 @@
         }
         
         .card.selected {
-            border-color: gold;
-            box-shadow: 0 0 20px rgba(255,215,0,0.8);
-            transform: translateY(-3px);
+            border: 4px solid #FF4444;
+            box-shadow: 0 0 25px rgba(255,68,68,0.9);
+            transform: translateY(-8px) scale(1.05);
+            background: linear-gradient(145deg, #fff5f5, #ffffff);
         }
         
         .card.starter {
@@ -2645,14 +2646,17 @@
             
             // Count player 1 hand (original 4 cards)
             const player1Points = scoreHandComplete(gameState.player1.originalHand, gameState.starter);
+            const player1Breakdown = getHandScoreBreakdown(gameState.player1.originalHand, gameState.starter);
             gameState.player1.score += player1Points;
             
             // Count player 2 hand (original 4 cards)
             const player2Points = scoreHandComplete(gameState.player2.originalHand, gameState.starter);
+            const player2Breakdown = getHandScoreBreakdown(gameState.player2.originalHand, gameState.starter);
             gameState.player2.score += player2Points;
             
             // Count crib (goes to dealer)
             const cribPoints = scoreHandComplete(gameState.crib, gameState.starter);
+            const cribBreakdown = getHandScoreBreakdown(gameState.crib, gameState.starter);
             const dealerName = gameState.dealer === 1 ? gameState.player1.name : gameState.player2.name;
             if (gameState.dealer === 1) {
                 gameState.player1.score += cribPoints;
@@ -2660,7 +2664,9 @@
                 gameState.player2.score += cribPoints;
             }
             
-            showMessage(`📊 Hand Scores: ${gameState.player1.name}: ${player1Points} points, ${gameState.player2.name}: ${player2Points} points, Crib (${dealerName}): ${cribPoints} points`, 'success', 5000);
+            // Display detailed scoring
+            displayHandScores(player1Points, player1Breakdown, player2Points, player2Breakdown, cribPoints, cribBreakdown, dealerName);
+            
             updateScoreDisplay();
             
             // Check for win
@@ -2669,6 +2675,85 @@
             }
             
             displayGameState();
+        }
+        
+        function getHandScoreBreakdown(hand, starter) {
+            if (!hand || hand.length === 0) return { breakdown: 'No cards', details: [] };
+            
+            const allCards = [...hand, starter];
+            let details = [];
+            let totalScore = 0;
+            
+            // Fifteens
+            const fifteensCount = scoreFifteens(allCards);
+            if (fifteensCount > 0) {
+                details.push(`Fifteens: ${fifteensCount * 2} points (${fifteensCount} combinations)`);
+                totalScore += fifteensCount * 2;
+            }
+            
+            // Pairs
+            const pairsScore = scorePairs(allCards);
+            if (pairsScore > 0) {
+                details.push(`Pairs: ${pairsScore} points`);
+                totalScore += pairsScore;
+            }
+            
+            // Runs
+            const runsScore = scoreRuns(allCards);
+            if (runsScore > 0) {
+                details.push(`Runs: ${runsScore} points`);
+                totalScore += runsScore;
+            }
+            
+            // Flush
+            const handSuits = hand.map(c => c.suit);
+            const allSameSuit = handSuits.every(suit => suit === handSuits[0]);
+            if (allSameSuit) {
+                if (starter.suit === handSuits[0]) {
+                    details.push(`Flush: 5 points (all cards same suit)`);
+                    totalScore += 5;
+                } else {
+                    details.push(`Flush: 4 points (hand same suit)`);
+                    totalScore += 4;
+                }
+            }
+            
+            // Nobs
+            if (hand.some(card => card.rank === 'J' && card.suit === starter.suit)) {
+                details.push(`Nobs: 1 point (Jack matches starter suit)`);
+                totalScore += 1;
+            }
+            
+            if (details.length === 0) {
+                details.push('No points scored');
+            }
+            
+            return { breakdown: details.join(', '), details: details, total: totalScore };
+        }
+        
+        function displayHandScores(player1Points, player1Breakdown, player2Points, player2Breakdown, cribPoints, cribBreakdown, dealerName) {
+            const gameMessage = document.getElementById('gameMessage');
+            gameMessage.classList.remove('hidden');
+            gameMessage.innerHTML = `
+                <div style="text-align: left; line-height: 1.6;">
+                    <h4 style="color: gold; margin-bottom: 10px;">📊 Hand Scoring Results:</h4>
+                    
+                    <div style="margin-bottom: 15px; padding: 10px; background: rgba(0,150,0,0.2); border-radius: 8px;">
+                        <strong>${gameState.player1.name}'s Hand: ${player1Points} points</strong><br>
+                        <small style="color: #ccc;">${player1Breakdown.breakdown}</small>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px; padding: 10px; background: rgba(0,100,150,0.2); border-radius: 8px;">
+                        <strong>${gameState.player2.name}'s Hand: ${player2Points} points</strong><br>
+                        <small style="color: #ccc;">${player2Breakdown.breakdown}</small>
+                    </div>
+                    
+                    <div style="margin-bottom: 10px; padding: 10px; background: rgba(255,215,0,0.2); border-radius: 8px;">
+                        <strong>Crib (${dealerName}): ${cribPoints} points</strong><br>
+                        <small style="color: #ccc;">${cribBreakdown.breakdown}</small>
+                    </div>
+                </div>
+            `;
         }
         
         function scoreHandComplete(hand, starter) {

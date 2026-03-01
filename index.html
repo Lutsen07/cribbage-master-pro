@@ -4086,16 +4086,24 @@
             // Reset for next sequence or end pegging
             gameState.peggingCount = 0;
             gameState.currentPlayer = gameState.currentPlayer === 1 ? 2 : 1;
-            
-            if (gameState.player1.hand.length === 0 && gameState.player2.hand.length === 0) {
+        
+        // BUG FIX: Only end pegging when BOTH players are completely out of cards
+        const p1CardsLeft = gameState.player1.hand.length;
+        const p2CardsLeft = gameState.player2.hand.length;
+        
+        if (p1CardsLeft === 0 && p2CardsLeft === 0) {
                 gameState.phase = 'count';
                 displayGameState();
                 setTimeout(countHands, 1000);
-            } else if (gameState.currentPlayer === 2) {
+            } else {
+            // At least one player has cards - continue pegging
+            console.log(`Pegging continues - P1: ${p1CardsLeft}, P2: ${p2CardsLeft} cards`);
+            if (gameState.currentPlayer === 2) {
                 setTimeout(computerPeggingTurn, 1500);
             }
-            
-            updatePeggingDisplay();
+        }
+        
+        updatePeggingDisplay();
         }
         
         function updatePeggingDisplay() {

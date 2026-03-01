@@ -4209,6 +4209,7 @@
       document.getElementById('gamePlay').classList.remove('hidden');
 
       updateScoreDisplay();
+  updateTraditionalBoard();
       dealCards();
       showMessage(`🎯 Starting game: ${player1Name} vs ${player2Name}!`, 'success', 3000);
     }
@@ -4967,7 +4968,68 @@ function playPeggingCard(player, cardIndex) {
     }
 
     // Expose debug function globally
-    window.runDebugTests = runDebugTests;
+    
+// ===== TRADITIONAL CRIBBAGE BOARD FUNCTIONS =====
+function createTraditionalBoard() {
+  let board = document.getElementById('traditionalBoard');
+  if (board) return board;
+  board = document.createElement('div');
+  board.className = 'traditional-board';
+  board.id = 'traditionalBoard';
+  board.innerHTML = '<div style="text-align: center; margin-bottom: 10px; color: #FFD700; font-size: 1.2em; font-weight: bold;">🎯 Cribbage Track</div><div class="board-track" id="boardTrack"></div>';
+  
+  const track = board.querySelector('#boardTrack');
+  // Create 121 holes in an oval pattern
+  for (let i = 1; i <= 121; i++) {
+    const hole = document.createElement('div');
+    hole.className = 'board-hole';
+    hole.id = 'board-hole-' + i;
+    hole.dataset.score = i;
+    if ([31, 61, 91, 121].includes(i)) {
+      hole.classList.add('corner');
+    }
+    track.appendChild(hole);
+  }
+  return board;
+}
+
+function updateTraditionalBoard() {
+  // Create or get board
+  let board = document.getElementById('traditionalBoard');
+  if (!board) {
+    const scoreDisplay = document.querySelector('#currentPhase .score-display');
+    if (scoreDisplay) {
+      board = createTraditionalBoard();
+      scoreDisplay.after(board);
+    }
+  }
+  
+  // Clear old pegs
+  document.querySelectorAll('.board-peg').forEach(p => p.remove());
+  
+  // Place pegs at current scores
+  if (gameState.player1.score > 0 && gameState.player1.score <= 121) {
+    const hole1 = document.getElementById('board-hole-' + gameState.player1.score);
+    if (hole1) {
+      const peg1 = document.createElement('div');
+      peg1.className = 'board-peg red board-peg-1';
+      peg1.style.animation = 'pegMove 0.5s ease-out';
+      hole1.appendChild(peg1);
+    }
+  }
+  
+  if (gameState.player2.score > 0 && gameState.player2.score <= 121) {
+    const hole2 = document.getElementById('board-hole-' + gameState.player2.score);
+    if (hole2) {
+      const peg2 = document.createElement('div');
+      peg2.className = 'board-peg blue board-peg-2';
+      peg2.style.animation = 'pegMove 0.5s ease-out 0.1s';
+      hole2.appendChild(peg2);
+    }
+  }
+}
+
+window.runDebugTests = runDebugTests;
 
     console.log('🎯 Cribbage Pro - Debug Fixed Version Ready!');
     console.log('💡 Try: runDebugTests() in console to run all tests');

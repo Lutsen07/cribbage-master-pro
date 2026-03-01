@@ -256,8 +256,7 @@
         /* CARD ANIMATIONS */
         .card.dealing {
             animation: dealCard 0.5s ease-out forwards;
-            opacity: 0;
-            transform: translateX(-100px) rotate(-10deg);
+            /* Don't set opacity/transform here - let animation handle it */
         }
         
         .card.playing {

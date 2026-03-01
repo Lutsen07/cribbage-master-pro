@@ -25,8 +25,18 @@
                 -webkit-text-size-adjust: 100%;
                 /* Optimize for mobile browsers */
                 -webkit-touch-callout: none;
+            }
+            
+            /* Prevent text selection on game elements only */
+            .card, .hand-container, .game-phase {
                 -webkit-user-select: none;
                 user-select: none;
+            }
+            
+            /* Ensure inputs are selectable */
+            input, textarea, button {
+                -webkit-user-select: text !important;
+                user-select: text !important;
             }
         }
         

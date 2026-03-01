@@ -4313,7 +4313,10 @@
         document.getElementById('player1HandArea').classList.remove('hidden');
 
         // Show player 1 hand (always visible to human player)
-        player1HandEl.innerHTML = '';
+        
+  // Add fanned class for card spread effect
+  player1HandEl.classList.add('fanned');
+  player1HandEl.innerHTML = '';
         gameState.player1.hand.forEach((card, index) => {
           const cardEl = createCardElementAnimated(card, index, 'player1');
           if (gameState.phase === 'discard' || gameState.phase === 'peg') {
@@ -4332,7 +4335,10 @@
         // Show computer hand during counting and game over phases
         if (gameState.phase === 'count' || gameState.phase === 'gameOver') {
           document.getElementById('player2HandArea').classList.remove('hidden');
-          player2HandEl.innerHTML = '';
+          
+  // Add fanned class for card spread effect
+  player2HandEl.classList.add('fanned');
+  player2HandEl.innerHTML = '';
           // Show computer's original 4-card hand for scoring
           const handsToShow = gameState.phase === 'count' ? gameState.player2.originalHand : gameState.player2.hand;
           handsToShow.forEach((card, index) => {

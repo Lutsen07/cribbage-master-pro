@@ -2570,9 +2570,15 @@
         
         function createCardElementAnimated(card, index, player) {
             const cardEl = createCardElement(card, index, player);
-            // Card starts invisible for deal animation
-            cardEl.style.opacity = '0';
-            cardEl.style.transform = 'translateX(-100px) rotate(-10deg)';
+            // Cards visible by default - animation will enhance if it runs
+            // Previously: opacity: '0'; transform: 'translateX(-100px) rotate(-10deg)';
+            // This caused invisible cards if animation failed
+            cardEl.style.opacity = '1';
+            cardEl.style.transform = 'translateX(0) rotate(0deg)';
+            // Add dealing class for animation when ready
+            setTimeout(() => {
+                cardEl.classList.add('dealing');
+            }, 10);
             return cardEl;
         }
         

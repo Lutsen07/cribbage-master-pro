@@ -4445,7 +4445,51 @@
       return parseInt(card.rank);
     }
 
-    function playPeggingCard(player, cardIndex) {
+    // ===== AUTOMATIC GO DETECTION =====
+function checkForAutoGo(player) {
+  // Check if player has any playable cards (would not exceed 31)
+  const hand = player === 1 ? gameState.player1.hand : gameState.player2.hand;
+  const hasPlayableCard = hand.some(card => {
+    return gameState.peggingCount + getCardValue(card) <= 31;
+  });
+  return !hasPlayableCard && hand.length > 0;
+}
+
+function processGo(player) {
+  console.log(`Player ${player} must say GO - no playable cards`);
+  const playerName = player === 1 ? gameState.player1.name : gameState.player2.name;
+  const otherPlayer = player === 1 ? gameState.player2 : gameState.player1;
+  // Award point if count is under 31
+  if (gameState.peggingCount < 31) {
+    otherPlayer.score++;
+    console.log(`${otherPlayer.name} gets 1 point for GO!`);
+    SoundEngine.playScore(1);
+    showMessage(`${otherPlayer.name} gets 1 point for GO!`, 'success', 2000);
+    updateScoreDisplay();
+  }
+  // Reset count
+  gameState.peggingCount = 0;
+  gameState.peggingCards = [];
+  gameState.currentPlayer = gameState.currentPlayer === 1 ? 2 : 1;
+    // Auto GO check for player 1 when it's their turn
+    if (gameState.currentPlayer === 1 && checkForAutoGo(1)) {
+      console.log("Player 1 must say GO - no playable cards");
+      processGo(1);
+    }
+
+  updatePeggingDisplay();
+  // Check if both players are out of cards
+  if (gameState.player1.hand.length === 0 && gameState.player2.hand.length === 0) {
+    gameState.phase = 'count';
+    displayGameState();
+    countHands();
+  } else if (gameState.currentPlayer === 2) {
+    setTimeout(computerPeggingTurn, 1500);
+  }
+  return true;
+}
+
+function playPeggingCard(player, cardIndex) {
       const card = player === 1 ? gameState.player1.hand[cardIndex] : gameState.player2.hand[cardIndex];
       const cardValue = getCardValue(card);
 
@@ -4519,6 +4563,13 @@
     }
 
     function computerPeggingTurn() {
+  // Auto GO detection - check if computer has no valid plays
+  if (checkForAutoGo(2)) {
+    console.log('Computer must say GO - no playable cards');
+    processGo(2);
+    return;
+  }
+
       // Simple AI: play first valid card
       for (let i = 0; i < gameState.player2.hand.length; i++) {
         const card = gameState.player2.hand[i];

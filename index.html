@@ -3184,30 +3184,79 @@
     }
 
     function scoreRuns(cards) {
-  const rankValues = {'A':1,'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13};
+  const rankValues = { 'A': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'J': 11, 'Q': 12, 'K': 13 };
+  
+  // Get unique ranks present and their counts
   const rankCounts = {};
-  cards.forEach(c => rankCounts[c.rank] = (rankCounts[c.rank]||0)+1);
-  const uniqueRanks = Object.keys(rankCounts).sort((a,b) => rankValues[a]-rankValues[b]);
-  let totalScore = 0;
+  cards.forEach(card => {
+    rankCounts[card.rank] = (rankCounts[card.rank] || 0) + 1;
+  });
+  
+  const uniqueRanks = Object.keys(rankCounts).sort((a, b) => rankValues[a] - rankValues[b]);
+  
+  if (uniqueRanks.length < 3) return 0; // Need at least 3 distinct ranks for a run
+  
+  // Find the LONGEST possible run(s) only
+  let maxRunLength = 0;
+  let maxRunCount = 0;
+  
+  // Check every starting position
   for (let start = 0; start < uniqueRanks.length; start++) {
-    for (let len = 3; start + len <= uniqueRanks.length; len++) {
-      const runRanks = uniqueRanks.slice(start, start + len);
-      let isConsecutive = true;
-      for (let i = 1; i < runRanks.length; i++) {
-        if (rankValues[runRanks[i]] !== rankValues[runRanks[i-1]] + 1) {
-          isConsecutive = false;
-          break;
-        }
+    // Try to extend run as far as possible
+    let currentLen = 1;
+    for (let i = start + 1; i < uniqueRanks.length; i++) {
+      if (rankValues[uniqueRanks[i]] === rankValues[uniqueRanks[i-1]] + 1) {
+        currentLen++;
+      } else {
+        break;
       }
-      if (isConsecutive) {
-        let ways = 1;
-        runRanks.forEach(r => ways *= rankCounts[r]);
-        totalScore += len * ways;
+    }
+    
+    if (currentLen >= 3) {
+      if (currentLen > maxRunLength) {
+        // Found longer run, reset
+        maxRunLength = currentLen;
+        maxRunCount = 1;
+      } else if (currentLen === maxRunLength) {
+        // Same length run found (rare unless duplicates allow)
+        maxRunCount++;
       }
     }
   }
-  return totalScore;
+  
+  if (maxRunLength < 3) return 0;
+  
+  // For the maximum length run(s), count how many DISTINCT complete runs
+  // A "distinct run" means using different cards (for duplicates)
+  let distinctRuns = 0;
+  
+  // Find all positions where a max-length run starts
+  for (let start = 0; start <= uniqueRanks.length - maxRunLength; start++) {
+    const runRanks = uniqueRanks.slice(start, start + maxRunLength);
+    
+    // Verify it's consecutive
+    let isConsecutive = true;
+    for (let i = 1; i < runRanks.length; i++) {
+      if (rankValues[runRanks[i]] !== rankValues[runRanks[i-1]] + 1) {
+        isConsecutive = false;
+        break;
+      }
+    }
+    
+    if (isConsecutive) {
+      // Count how many ways to make THIS specific run (due to duplicates)
+      let ways = 1;
+      runRanks.forEach(rank => {
+        ways *= rankCounts[rank];
+      });
+      distinctRuns += ways;
+    }
+  }
+  
+  console.log("Runs: length=" + maxRunLength + ", distinct=" + distinctRuns + ", total=" + (maxRunLength * distinctRuns));
+  return maxRunLength * distinctRuns;
 }
+
 function scoreFlush(hand, starter) {
       const handSuit = hand[0].suit;
       const handFlush = hand.every(card => card.suit === handSuit);

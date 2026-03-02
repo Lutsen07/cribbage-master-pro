@@ -3183,73 +3183,32 @@
       };
     }
 
-    function scoreRuns(hand, starter) {
-      const allCards = [...hand, starter];
-      const rankValues = {
-        'A': 1,
-        '2': 2,
-        '3': 3,
-        '4': 4,
-        '5': 5,
-        '6': 6,
-        '7': 7,
-        '8': 8,
-        '9': 9,
-        '10': 10,
-        'J': 11,
-        'Q': 12,
-        'K': 13
-      };
-
-      const rankCounts = {};
-      allCards.forEach(card => {
-        rankCounts[card.rank] = (rankCounts[card.rank] || 0) + 1;
-      });
-
-      const uniqueRanks = Object.keys(rankCounts).sort((a, b) => rankValues[a] - rankValues[b]);
-
-      // Find longest consecutive sequence
-      let longestRun = 0;
-      let currentRun = 1;
-      let runStart = -1;
-
-      for (let i = 1; i < uniqueRanks.length; i++) {
-        if (rankValues[uniqueRanks[i]] === rankValues[uniqueRanks[i - 1]] + 1) {
-          if (currentRun === 1) runStart = i - 1;
-          currentRun++;
-        } else {
-          if (currentRun > longestRun) {
-            longestRun = currentRun;
-          }
-          currentRun = 1;
+    function scoreRuns(cards) {
+  const rankValues = {'A':1,'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'10':10,'J':11,'Q':12,'K':13};
+  const rankCounts = {};
+  cards.forEach(c => rankCounts[c.rank] = (rankCounts[c.rank]||0)+1);
+  const uniqueRanks = Object.keys(rankCounts).sort((a,b) => rankValues[a]-rankValues[b]);
+  let totalScore = 0;
+  for (let start = 0; start < uniqueRanks.length; start++) {
+    for (let len = 3; start + len <= uniqueRanks.length; len++) {
+      const runRanks = uniqueRanks.slice(start, start + len);
+      let isConsecutive = true;
+      for (let i = 1; i < runRanks.length; i++) {
+        if (rankValues[runRanks[i]] !== rankValues[runRanks[i-1]] + 1) {
+          isConsecutive = false;
+          break;
         }
       }
-
-      if (currentRun > longestRun) longestRun = currentRun;
-
-      if (longestRun >= 3) {
-        // Multiply by number of cards for each rank in the run
-        let runScore = longestRun;
-        const runRanks = uniqueRanks.slice(runStart, runStart + longestRun);
-
-        runRanks.forEach(rank => {
-          runScore *= rankCounts[rank];
-        });
-        runScore /= longestRun; // Divide back out to get correct multiplier
-
-        return {
-          score: runScore,
-          description: `Run: ${runScore} points (${runRanks.join('-')})`
-        };
+      if (isConsecutive) {
+        let ways = 1;
+        runRanks.forEach(r => ways *= rankCounts[r]);
+        totalScore += len * ways;
       }
-
-      return {
-        score: 0,
-        description: ''
-      };
     }
-
-    function scoreFlush(hand, starter) {
+  }
+  return totalScore;
+}
+function scoreFlush(hand, starter) {
       const handSuit = hand[0].suit;
       const handFlush = hand.every(card => card.suit === handSuit);
 
